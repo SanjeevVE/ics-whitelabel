@@ -3,8 +3,6 @@ import React from 'react';
 import { useEvents } from '@/hooks/useEvent';
 import MetaTags from '@/components/MetaTags';
 import EventCard from '@/components/EventCard';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 const Index = () => {
   const { events, loading, error } = useEvents();
@@ -24,20 +22,15 @@ const Index = () => {
       
       <div className="bg-gradient-to-b from-primary-100 to-white">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Discover Amazing Events</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Multi-Tenant Event Platform</h1>
           <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-8">
-            Find and register for the most exciting events happening in your area. Connect with people who share your interests.
+            Discover amazing events, each with their own dedicated event site. Create and manage events with your own custom subdomain.
           </p>
-          <Button asChild size="lg" className="bg-primary-600 hover:bg-primary-700">
-            <Link to={loading ? "#" : `/event/${events[0]?.id || ''}`}>
-              Browse Featured Event
-            </Link>
-          </Button>
         </div>
       </div>
       
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8">Upcoming Events</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-8">Featured Events</h2>
         
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,10 +48,28 @@ const Index = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard 
+                key={event.id} 
+                event={event} 
+                tenantMode={true}
+              />
             ))}
           </div>
         )}
+      </div>
+      
+      <div className="bg-gray-100 py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Create Your Own Event Website</h2>
+            <p className="text-lg text-gray-700 mb-8">
+              Want to host your own event? Our platform makes it easy to create a dedicated event website with your own custom subdomain.
+            </p>
+            <button className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium">
+              Get Started
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );

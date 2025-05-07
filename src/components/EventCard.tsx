@@ -8,9 +8,15 @@ import type { Event } from '@/hooks/useEvent';
 
 interface EventCardProps {
   event: Event;
+  tenantMode?: boolean;
 }
 
-const EventCard = ({ event }: EventCardProps) => {
+const EventCard = ({ event, tenantMode = false }: EventCardProps) => {
+  // Determine the link based on whether we're using tenant mode
+  const eventLink = tenantMode ? 
+    `/${event.slug}` :  // For tenant/subdomain mode
+    `/event/${event.id}`; // For regular mode
+    
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div 
@@ -44,10 +50,18 @@ const EventCard = ({ event }: EventCardProps) => {
         </div>
       </CardContent>
       
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-2">
         <Button asChild className="w-full">
-          <Link to={`/event/${event.id}`}>View Details</Link>
+          <Link to={eventLink}>View Event Site</Link>
         </Button>
+        
+        {tenantMode && (
+          <div className="text-sm text-gray-500 w-full text-center">
+            <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+              {event.slug}.youreventplatform.com
+            </span>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
