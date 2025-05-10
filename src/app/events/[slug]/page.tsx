@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
 import Head from "next/head";
+import RightSidebar from "@/components/event-landing-page/RightSidebar";
 
 import Tshirt from "../../../../public/img/event-landing-page/tshirt.png";
 import Medal from "../../../../public/img/event-landing-page/medal.png";
@@ -23,27 +24,6 @@ import OnlinePhotos from "../../../../public/img/event-landing-page/onlinephotos
 import FinisherShield from "../../../../public/img/event-landing-page/shield.png";
 
 import { getEventBySlug } from "@/lib/api";
-
-
-const giveAwayImages: Record<string, any> = {
-  "Race T-shirt": Tshirt,
-  "Finisher's Medal": Medal,
-  "Bib Number with timing chip": Chip,
-  "Goodie Bag": Gift,
-  "Finisher e-Certificate": Certificate,
-  "Hydration Support": Hidrate,
-  "Non Timed BIB": NonTimed,
-  Breakfast: Breakfast,
-  Refreshments: Refreshments,
-  Certificate: Certificate1,
-  Physio: Physio,
-  "Selfie Booth": SelfiBooth,
-  "Online Photos": OnlinePhotos,
-  "Finisher shield": FinisherShield,
-  "Race Tshirt (Excluding 3K Majja Run)": Tshirt,
-  "Finisher Medal (Excluding 3K Majja Run)": Medal,
-  "Bib with Timing Chip (Excluding 3K Majja Run)": Chip,
-};
 
 interface CategoryDetail {
   amount: string;
@@ -72,13 +52,119 @@ interface Event {
   layout?: string;
   status?: string;
   tag?: string;
+  orgEmail?: string;
+  contactNum?: string;
 }
 
-const AvailableRooms2 = ({ event }: { event: Event | null }) => {
-  if (!event || !event.category) return null;
+const giveAwayImages = {
+  "Race T-shirt": Tshirt,
+  "Finisher's Medal": Medal,
+  "Bib Number with timing chip": Chip,
+  "Goodie Bag": Gift,
+  "Finisher e-Certificate": Certificate,
+  "Hydration Support": Hidrate,
+  "Non Timed BIB": NonTimed,
+  Breakfast: Breakfast,
+  Refreshments: Refreshments,
+  Certificate: Certificate1,
+  Physio: Physio,
+  "Selfie Booth": SelfiBooth,
+  "Online Photos": OnlinePhotos,
+  "Finisher shield": FinisherShield,
+  "Race Tshirt (Excluding 3K Majja Run)": Tshirt,
+  "Finisher Medal (Excluding 3K Majja Run)": Medal,
+  "Bib with Timing Chip (Excluding 3K Majja Run)": Chip,
+};
 
-  return (
-    <>
+export default function EventPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [event, setEvent] = useState<Event | null>(null);
+  const [latitude, setLatitude] = useState<string | null>(null);
+  const [longitude, setLongitude] = useState<string | null>(null);
+
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const slug = params?.slug as string;
+  const name = searchParams?.get("name");
+
+  function isRegistrationOpen(eventData: Event) {
+    return (
+      eventData.status === "OPENFORREGISTRATION" ||
+      eventData.status === "UPCOMING"
+    );
+  }
+
+  function buildRegistrationLink(eventData: Event, itemName?: string) {
+    return `/events/${eventData.slug}/register?name=${itemName || ""}${
+      eventData.layout ? "&layout=" + eventData.layout : ""
+    }`;
+  }
+
+  function formatEventDate(dateString: string) {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime())
+      ? format(date, "MMMM dd, yyyy - EEEE")
+      : dateString;
+  }
+
+  function getFormattedDate() {
+    const dateString = event?.date || "";
+    return formatEventDate(dateString);
+  }
+
+  async function fetchEventData(slug: string) {
+    try {
+      setLoading(true);
+      const response = await getEventBySlug(slug);
+
+      if (response.data) {
+        setEvent(response.data);
+
+        if (response.data.location) {
+          await fetchLocationCoordinates(response.data.location);
+        }
+      } else {
+        setError("Event not found");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Error fetching event data";
+      setError(errorMessage);
+      console.error("Error fetching event data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchLocationCoordinates(location: string) {
+    try {
+      const geocodeResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          location
+        )}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+      );
+      const geocodeData = await geocodeResponse.json();
+
+      if (geocodeData.results && geocodeData.results.length > 0) {
+        const { lat, lng } = geocodeData.results[0].geometry.location;
+        setLatitude(lat.toString());
+        setLongitude(lng.toString());
+      }
+    } catch (geocodeErr) {
+      console.error("Error geocoding:", geocodeErr);
+    }
+  }
+
+  useEffect(() => {
+    if (!slug) return;
+    fetchEventData(slug);
+  }, [slug]);
+
+  function EventCategories({ event }: { event: Event }) {
+    if (!event || !event.category) return null;
+
+    return (
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
         {event.category.map((item, index) => (
           <div key={index} className='flex flex-col'>
@@ -121,12 +207,10 @@ const AvailableRooms2 = ({ event }: { event: Event | null }) => {
                   </div>
                 )}
               </div>
-              {event.status === "OPENFORREGISTRATION" ||
-              event.status === "UPCOMING" ? (
+
+              {isRegistrationOpen(event) ? (
                 <Link
-                  href={`/events/${event.slug}/register?name=${item.name}${
-                    event.layout ? "&layout=" + event.layout : ""
-                  }`}
+                  href={buildRegistrationLink(event, item.name)}
                   className='inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors'
                 >
                   Register
@@ -140,91 +224,42 @@ const AvailableRooms2 = ({ event }: { event: Event | null }) => {
           </div>
         ))}
       </div>
-    </>
-  );
-};
+    );
+  }
 
-const Overview = ({ event }: { event: Event | null }) => {
-  if (!event || !event.aboutEvent) return null;
+  function EventOverview({ event }: { event: Event }) {
+    if (!event || !event.aboutEvent) return null;
 
-  const aboutEvent = event.aboutEvent.split("\n").join("<br/>");
+    const aboutEvent = event.aboutEvent.split("\n").join("<br/>");
 
-  return (
-    <div className='mt-5 text-base'>
-      <div dangerouslySetInnerHTML={{ __html: aboutEvent }} />
-    </div>
-  );
-};
-
-
-const TopBreadCrumb = ({
-  event,
-  breadcrumbName,
-  name,
-}: {
-  event: Event | null;
-  breadcrumbName: string;
-  name?: string;
-}) => {
-  return (
-    <section className='py-3 px-3 flex items-center bg-white'>
-      <div className='flex items-center justify-between w-full'>
-        <div className='flex gap-2 items-center text-sm'>
-          <div>{event?.eventName}</div>
-          <div>&gt;</div>
-          <div>{name || breadcrumbName}</div>
-        </div>
+    return (
+      <div className='mt-5 text-base'>
+        <div dangerouslySetInnerHTML={{ __html: aboutEvent }} />
       </div>
-    </section>
-  );
-};
+    );
+  }
 
-export default function EventPage() {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
-  const [event, setEvent] = useState<Event | null>(null);
-
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const slug = params?.slug as string;
-  const name = searchParams?.get("name");
-
-  useEffect(() => {
-    if (!slug) return;
-
-    const fetchEvent = async () => {
-      try {
-        setLoading(true);
-        const response = await getEventBySlug(slug);
-        if (response.data) {
-          setEvent(response.data);
-        } else {
-          setError("Event not found");
-        }
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Error fetching event data";
-        setError(errorMessage);
-        console.error("Error fetching event data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvent();
-  }, [slug]);
-
-  const getDateString = () => {
-    const dateString = event?.date || "";
-    const date = new Date(dateString);
-    return !isNaN(date.getTime())
-      ? format(date, "MMMM dd, yyyy - EEEE")
-      : dateString;
-  };
-
-  const imageUrl = event?.eventPicture
-    ? `https://www.novarace.in/pages/image?url=${event.eventPicture}`
-    : null;
+  function BreadcrumbNavigation({
+    event,
+    breadcrumbName,
+    name,
+  }: {
+    event: Event | null;
+    breadcrumbName: string;
+    name?: string;
+  }) {
+    return (
+      <section className='py-3 px-3 flex items-center bg-white'>
+        <div className='flex items-center justify-between w-full'>
+          <div className='flex gap-2 items-center text-sm'>
+            <div>{event?.eventName}</div>
+            <div>&gt;</div>
+            <div>{name || breadcrumbName}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (loading) {
     return (
@@ -267,6 +302,166 @@ export default function EventPage() {
     );
   }
 
+  function renderClosedEventNotification() {
+    if (event && event.status === "CLOSED") {
+      return (
+        <div className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4'>
+          <p className='font-bold'>Registration Closed</p>
+          <p>Registration for this event is currently closed.</p>
+        </div>
+      );
+    }
+    return null;
+  }
+
+  function renderEventImage() {
+    if (!event?.eventPicture) return null;
+
+    return (
+      <div className='mt-4 rounded-lg overflow-hidden'>
+        <Image
+          src={event.eventPicture}
+          alt={event.eventName}
+          width={1200}
+          height={600}
+          className='w-full h-auto rounded-lg'
+        />
+      </div>
+    );
+  }
+
+  function renderEventDescription() {
+    if (!event?.description) return null;
+
+    return (
+      <div className='mt-6'>
+        <h2 className='text-2xl font-semibold mb-3'>About This Event</h2>
+        <div className='prose max-w-none'>
+          <div dangerouslySetInnerHTML={{ __html: event.description }} />
+        </div>
+      </div>
+    );
+  }
+
+  function renderCategoriesSection() {
+    if (!event?.category || event.category.length === 0) return null;
+
+    return (
+      <div className='mt-8'>
+        <h2 className='text-2xl font-semibold mb-4'>Registration Categories</h2>
+        <EventCategories event={event} />
+      </div>
+    );
+  }
+
+  function renderOrganizerSection() {
+    if (!event?.orgEmail && !event?.contactNum) return null;
+
+    return (
+      <div className='mt-8'>
+        <h2 className='text-2xl font-semibold mb-3'>Organizer Contact</h2>
+        <div className='flex flex-col gap-2'>
+          {event.orgEmail && (
+            <div className='flex items-center'>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-5 w-5 mr-2'
+                viewBox='0 0 20 20'
+                fill='currentColor'
+              >
+                <path d='M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z' />
+                <path d='M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z' />
+              </svg>
+              <a
+                href={`mailto:${event.orgEmail}`}
+                className='text-blue-600 hover:underline'
+              >
+                {event.orgEmail}
+              </a>
+            </div>
+          )}
+
+          {event.contactNum && (
+            <div className='flex items-center'>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-5 w-5 mr-2'
+                viewBox='0 0 20 20'
+                fill='currentColor'
+              >
+                <path d='M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z' />
+              </svg>
+              <a
+                href={`tel:${event.contactNum}`}
+                className='text-blue-600 hover:underline'
+              >
+                {event.contactNum}
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function renderGiveawaySection() {
+    if (!event?.giveAway || event.giveAway.length === 0) return null;
+
+    return (
+      <div className='mt-8'>
+        <h2 className='text-2xl font-semibold mb-4'>What You Get</h2>
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+          {event.giveAway.map((item, index) => (
+            <div
+              key={index}
+              className='flex flex-col items-center p-4 bg-blue-50 rounded-lg shadow-sm text-center'
+            >
+              {giveAwayImages[item.name as keyof typeof giveAwayImages] && (
+                <div className='mb-2'>
+                  <Image
+                    src={
+                      giveAwayImages[item.name as keyof typeof giveAwayImages]
+                    }
+                    alt={item.name}
+                    width={60}
+                    height={60}
+                  />
+                </div>
+              )}
+              <span className='text-sm font-medium'>{item.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function renderEventDetails() {
+    if (!event?.aboutEvent) return null;
+
+    return (
+      <div className='mt-6'>
+        <h2 className='text-2xl font-semibold mb-3'>Event Details</h2>
+        <EventOverview event={event} />
+      </div>
+    );
+  }
+
+  function renderMobileRegistrationButton() {
+    if (!event || !isRegistrationOpen(event)) return null;
+
+    return (
+      <div className='mt-8 md:hidden'>
+        <Link
+          href={buildRegistrationLink(event)}
+          className='block w-full py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors'
+        >
+          Register Now
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -277,58 +472,12 @@ export default function EventPage() {
         />
       </Head>
 
-      {event?.tag === "Closed" && (
-        <div className='text-center text-red-600 bg-gray-100 p-4'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            className='w-8 h-8 mx-auto'
-            viewBox='0 0 24 24'
-          >
-            <g
-              fill='none'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth='2'
-            >
-              <path d='M0 0h24v24H0z'></path>
-              <path
-                fill='currentColor'
-                d='M12 1.67c.955 0 1.845.467 2.39 1.247l.105.16l8.114 13.548a2.914 2.914 0 0 1-2.307 4.363l-.195.008H3.882a2.914 2.914 0 0 1-2.582-4.2l.099-.185l8.11-13.538A2.914 2.914 0 0 1 12 1.67M12.01 15l-.127.007a1 1 0 0 0 0 1.986L12 17l.127-.007a1 1 0 0 0 0-1.986zM12 8a1 1 0 0 0-.993.883L11 9v4l.007.117a1 1 0 0 0 1.986 0L13 13V9l-.007-.117A1 1 0 0 0 12 8'
-              ></path>
-            </g>
-          </svg>
-          {event?.slug === "mutthu-marathon-2025" ? (
-            <>
-              <h3 className='my-2 text-red-600 font-bold'>
-                Registrations are closed for Mutthu Marathon
-              </h3>
-              <h5 className='text-lg'>
-                {`However, you can still express your interest by filling out this form or contacting the organizer directly at +91-9443057177 and +91-9750943456 for further participation details. See you all on ${getDateString()}`}
-              </h5>
-              <h5 className='text-lg'>
-                Form Link:{" "}
-                <a
-                  href='https://forms.gle/EdvvAUNRZJkJrs5m8'
-                  className='text-blue-600'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  https://forms.gle/EdvvAUNRZJkJrs5m8
-                </a>
-              </h5>
-            </>
-          ) : (
-            <h5 className='text-lg'>
-              {`Registrations for this event is closed. See you all on ${getDateString()}`}
-            </h5>
-          )}
-        </div>
-      )}
+      {renderClosedEventNotification()}
 
       <section className='pt-40'>
         <div className='container mx-auto px-4'>
-          <div className='flex flex-col gap-6'>
-            <div className='w-full'>
+          <div className='flex flex-col lg:flex-row gap-6'>
+            <div className='w-full lg:w-2/3'>
               <div className='flex justify-between items-end pt-10 gap-3 flex-wrap'>
                 <div className='flex justify-end md:hidden w-full'>
                   <Link
@@ -405,247 +554,29 @@ export default function EventPage() {
                               d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
                             />
                           </svg>
-                          {getDateString()}
+                          {getFormattedDate()}
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+
+              {renderEventImage()}
+              {renderEventDescription()}
+              {renderEventDetails()}
+              {renderCategoriesSection()}
+              {renderOrganizerSection()}
+              {renderGiveawaySection()}
+              {renderMobileRegistrationButton()}
             </div>
 
-            {imageUrl && (
-              <div className='w-full mt-5'>
-                <img
-                  src={imageUrl}
-                  alt={event.eventName}
-                  className='w-full h-auto rounded-lg shadow-lg'
-                />
-              </div>
-            )}
-
-            {event.description && (
-              <div className='w-full mt-5'>
-                <h3 className='text-2xl font-medium'>About This Event</h3>
-                <div className='mt-3'>
-                  <p>{event.description}</p>
-                </div>
-              </div>
-            )}
-
-            {event.aboutEvent && (
-              <div className='w-full mt-5'>
-                <h3 className='text-2xl font-medium'>Details</h3>
-                <Overview event={event} />
-              </div>
-            )}
-
-            {event.category && event.category.length > 0 && (
-              <div className='w-full mt-8'>
-                <h3 className='text-2xl font-medium border-t border-gray-200 pt-5'>
-                  Categories
-                </h3>
-                <div className='mt-5'>
-                  <AvailableRooms2 event={event} />
-                </div>
-              </div>
-            )}
-
-            {event.slug === "skinathon-2025" && (
-              <div className='w-full mt-8 border-t border-gray-200 pt-5'>
-                <h3 className='text-2xl font-bold text-center'>
-                  About Organizer
-                </h3>
-                <div className='flex justify-center items-center flex-col md:flex-row'>
-                  <div className='flex justify-center items-center mt-4'>
-                    <div className='w-1/2 md:w-1/4 px-3'>
-                      <img
-                        src='/img/general/skinathon4.png'
-                        alt='IADVL Karnataka logo'
-                        className='rounded-lg w-full'
-                      />
-                    </div>
-                    <div className='w-1/2 md:w-1/4 px-3'>
-                      <img
-                        src='/img/general/skinathon1.png'
-                        alt='IADVL logo'
-                        className='rounded-lg w-full'
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className='mt-4'>
-                  <span className='font-bold'>IADVL Karnataka</span>
-                  <br />
-                  The Indian Association of Dermatologists Venereologists and
-                  Leprologists (IADVL) came into existence on the 28th of
-                  January 1973 at Udaipur with the merger of the Indian
-                  association of dermatologists and Venereologists (IADV) and
-                  the dermatological society of India (DSI).
-                </div>
-              </div>
-            )}
-
-            {event.slug === "toyota-bidadi-half-marathon-second-edition" && (
-              <div className='w-full mt-8 border-t border-gray-200 pt-5'>
-                <h3 className='text-2xl font-bold text-center'>
-                  About Organizer
-                </h3>
-                <div className='flex justify-center items-center flex-col md:flex-row'>
-                  <div className='flex justify-center items-center mt-4'>
-                    <div className='w-1/2 md:w-1/4 px-3'>
-                      <img
-                        src='/img/general/BIA_Foundation_Logo2.png'
-                        alt='BIA Foundation logo'
-                        className='rounded-lg w-full'
-                      />
-                    </div>
-                    <div className='w-1/3 md:w-1/6 px-3'>
-                      <img
-                        src='/img/general/BIA_Foundation_Logo1.png'
-                        alt='BIA logo'
-                        className='rounded-lg w-full'
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className='mt-4'>
-                  <span className='font-bold'>
-                    Bidadi Industries Association (BIA)
-                  </span>
-                  <br />
-                  The association serves as a non-profit forum for members,
-                  addressing industry challenges, advocating with authorities,
-                  and fostering solutions.
-                </div>
-                <div className='mt-3'>
-                  <span className='font-bold'>BIA Foundation</span>
-                  <br />
-                  Established on 22nd September 2023, the BIA Foundation is
-                  dedicated to driving impactful change through initiatives
-                  focused on eradicating poverty and malnutrition, promoting
-                  healthcare, education, gender equality, and environmental
-                  sustainability.
-                </div>
-              </div>
-            )}
-
-            {event.slug === "moonlight-track-run-2025" && (
-              <div className='w-full mt-8 border-t border-gray-200 pt-5'>
-                <h3 className='text-2xl font-bold text-center'>
-                  About Organizer
-                </h3>
-                <div className='flex justify-center items-center flex-col md:flex-row'>
-                  <div className='flex justify-center items-center mt-4'>
-                    <div className='w-1/2 md:w-1/4 px-3'>
-                      <img
-                        src='/img/general/salemrunnerslogo.jpg'
-                        alt='Salem Runners Club logo'
-                        className='rounded-lg w-full'
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className='mt-4'>
-                  <span className='font-bold'>Salem Runners Club</span>
-                  <br />
-                  Founded with the mission to inspire fitness in the community,
-                  Salem Runners Club is one of Tamil Nadu's most passionate
-                  running collectives.
-                </div>
-                <div className='mt-3'>
-                  <span className='font-bold'>Follow us on:</span>
-                  <br />
-                  Website:{" "}
-                  <a
-                    href='https://www.salemrunnersclub.com'
-                    className='text-blue-600'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    www.salemrunnersclub.com
-                  </a>
-                  <br />
-                  Instagram:{" "}
-                  <a
-                    href='https://www.instagram.com/salemrunnersclub'
-                    className='text-blue-600'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    @salemrunnersclub
-                  </a>
-                  <br />
-                  Facebook:{" "}
-                  <a
-                    href='https://www.facebook.com/salemrunnersindia'
-                    className='text-blue-600'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    /salemrunnersclub
-                  </a>
-                </div>
-              </div>
-            )}
-
-            {event.giveAway && event.giveAway.length > 0 && (
-              <div className='w-full mt-8'>
-                <h3 className='text-2xl font-medium border-t border-gray-200 pt-5'>
-                  Give Away
-                </h3>
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5'>
-                  {event.giveAway.map((item, index) => {
-                    const imageSrc = giveAwayImages[item.name];
-                    return (
-                      <div key={index} className='flex gap-2 items-center mb-2'>
-                        {imageSrc && (
-                          <div
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              flexShrink: 0,
-                            }}
-                          >
-                            <Image
-                              src={imageSrc}
-                              alt={item.name}
-                              width={50}
-                              height={50}
-                              className='mr-2'
-                            />
-                          </div>
-                        )}
-                        <div className='text-base'>{item.name}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            <div className='w-full mt-8 flex justify-center'>
-              <Link
-                href={`/events/${event.slug}/register${
-                  event.layout ? `?layout=${event.layout}` : ""
-                }`}
-                className='py-4 px-10 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-lg'
-              >
-                Register Now
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  className='h-5 w-5 ml-2'
-                  viewBox='0 0 20 20'
-                  fill='currentColor'
-                >
-                  <path
-                    fillRule='evenodd'
-                    d='M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z'
-                    clipRule='evenodd'
-                  />
-                </svg>
-              </Link>
-            </div>
+            <RightSidebar
+              event={event}
+              latitude={latitude}
+              longitude={longitude}
+              formatEventDate={formatEventDate}
+            />
           </div>
         </div>
       </section>
