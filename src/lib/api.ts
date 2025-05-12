@@ -22,7 +22,7 @@ export const fetchEvents = async ({
   return {
     data,
     headers: {
-      "x-total-count": totalCountHeader ?? data.length.toString(), // fallback to data length
+      "x-total-count": totalCountHeader ?? data.length.toString(), 
     },
   };
 };
