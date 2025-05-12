@@ -10,6 +10,7 @@ interface Event {
   layout?: string;
   orgEmail?: string;
   contactNum?: string;
+  eventPicture?: string;
 }
 
 interface RightSidebarProps {
@@ -35,15 +36,23 @@ const RightSidebar = ({ event, latitude, longitude, formatEventDate }: RightSide
 
   if (!event) return null;
 
+  // Properly build the registration link within the component
+  const buildRegistrationLink = () => {
+    return `/events/${event.slug}/register${event.layout ? `?layout=${event.layout}` : ""}`;
+  };
+
   return (
     <div 
       className={`w-full lg:w-1/3 px-4 ${isSticky ? "lg:sticky lg:top-24 transition-all duration-300" : ""}`}
     >
       {/* Register Button */}
       {(event.status === "OPENFORREGISTRATION" || event.status === "UPCOMING") && (
-        <button className="inline-block w-full py-3 px-6 bg-blue-600 text-white text-center rounded hover:bg-blue-700 transition-colors">
-          Register <span className="inline-block ml-3 transform rotate-45">↑</span>
-        </button>
+        <Link
+          href={buildRegistrationLink()}
+          className="inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+        >
+          Register now
+        </Link>
       )}
       
       {/* Event Details Card */}

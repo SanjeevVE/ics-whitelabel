@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 
+
 export const metadata: Metadata = {
   title: "Events | NovaRace",
   description: "Find and register for the best running, cycling, and adventure events across India",
@@ -17,16 +18,7 @@ export default function EventsLayout({ children }: { children: ReactNode }) {
               NovaRace
             </a>
 
-            {/* Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
 
-              <a 
-                href="/register" 
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
-              >
-                Register
-              </a>
-            </div>
 
             {/* Mobile Menu Button (Static in layout) */}
             <button className="md:hidden text-gray-800">

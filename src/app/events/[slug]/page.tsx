@@ -96,8 +96,8 @@ export default function EventPage() {
   }
 
   function buildRegistrationLink(eventData: Event, itemName?: string) {
-    return `/events/${eventData.slug}/register?name=${itemName || ""}${
-      eventData.layout ? "&layout=" + eventData.layout : ""
+    return `/events/${eventData.slug}/register${itemName ? `?name=${encodeURIComponent(itemName)}` : ""}${
+      eventData.layout ? (itemName ? "&" : "?") + "layout=" + eventData.layout : ""
     }`;
   }
 
@@ -480,26 +480,42 @@ export default function EventPage() {
             <div className='w-full lg:w-2/3'>
               <div className='flex justify-between items-end pt-10 gap-3 flex-wrap'>
                 <div className='flex justify-end md:hidden w-full'>
-                  <Link
-                    href={`/events/${event.slug}/register${
-                      event.layout ? `?layout=${event.layout}` : ""
-                    }`}
-                    className='py-3 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center'
-                  >
-                    Register
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      className='h-5 w-5 ml-2'
-                      viewBox='0 0 20 20'
-                      fill='currentColor'
+                  {isRegistrationOpen(event) ? (
+                    <Link
+                      href={buildRegistrationLink(event)}
+                      className='py-3 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center'
                     >
-                      <path
-                        fillRule='evenodd'
-                        d='M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z'
-                        clipRule='evenodd'
-                      />
-                    </svg>
-                  </Link>
+                      Register Now1
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='h-5 w-5 ml-2'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <span className='py-3 px-6 bg-blue-600 text-white rounded opacity-70 cursor-not-allowed flex items-center'>
+                      Register Now2
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='h-5 w-5 ml-2'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    </span>
+                  )}
                 </div>
 
                 <div>
