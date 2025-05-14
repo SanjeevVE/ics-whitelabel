@@ -1,3 +1,4 @@
+import { baseUrl } from './apiConfig';
 
 export const fetchEvents = async ({
   showOnWebsite = true,
@@ -10,7 +11,7 @@ export const fetchEvents = async ({
     showOnWebsite: String(showOnWebsite),
   });
 
-  const response = await fetch(`http://localhost:3001/api/events/get-resultsascorder?status=OPENFORREGISTRATION,REGISTRATIONCLOSED`);
+  const response = await fetch(`${baseUrl}/events/get-resultsascorder?status=OPENFORREGISTRATION,REGISTRATIONCLOSED`);
   
   if (!response.ok) {
     throw new Error("Failed to fetch events");
@@ -29,7 +30,7 @@ export const fetchEvents = async ({
 
 
 export const getEventBySlug = async (slug: string) => {
-  const response = await fetch(`http://localhost:3001/api/events/get-eventbyslug?slug=${slug}`);
+  const response = await fetch(`${baseUrl}/events/get-eventbyslug?slug=${slug}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch event');
