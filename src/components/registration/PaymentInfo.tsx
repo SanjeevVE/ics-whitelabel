@@ -114,8 +114,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
   const currday = new Date();
   const orderId = currday.getTime().toString();
-
-  // Load Razorpay script
+console.log("form values", formValues);
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -310,162 +309,12 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                 <tbody className='divide-y divide-gray-200'>
                   <tr className='bg-gray-50'>
                     <th className='p-3 text-left text-sm font-medium text-gray-700 whitespace-nowrap'>
-                      {event?.isGroupRegistrations
-                        ? "Total ticket price"
-                        : relayCategory?.isRelay === "YES"
-                        ? "Ticket Price"
-                        : "Ticket Price"}
-
-                      {(event?.isGroupRegistrations ||
-                        relayCategory?.isRelay === "YES") && (
-                        <button
-                          onClick={() => setIsExpanded(!isExpanded)}
-                          className='ml-2 text-blue-500 focus:outline-none'
-                          aria-label={
-                            isExpanded ? "Collapse details" : "Expand details"
-                          }
-                        >
-                          {isExpanded ? (
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              className='h-4 w-4 inline'
-                              fill='none'
-                              viewBox='0 0 24 24'
-                              stroke='currentColor'
-                            >
-                              <path
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                strokeWidth={2}
-                                d='M5 15l7-7 7 7'
-                              />
-                            </svg>
-                          ) : (
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              className='h-4 w-4 inline'
-                              fill='none'
-                              viewBox='0 0 24 24'
-                              stroke='currentColor'
-                            >
-                              <path
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                strokeWidth={2}
-                                d='M19 9l-7 7-7-7'
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      )}
+                      Ticket Price
                     </th>
                     <td className='p-3 text-right font-semibold text-gray-900'>
-                      ₹{" "}
-                      {event?.isGroupRegistrations
-                        ? groupAmount
-                        : relayCategory?.isRelay === "YES" &&
-                          relayCategory?.amount
-                        ? relayCategory.amount
-                        : findCategory?.amount || 0}
+                      ₹{findCategory?.amount || 0}
                     </td>
                   </tr>
-
-                  {isExpanded &&
-                    (event?.isGroupRegistrations ||
-                      relayCategory?.isRelay === "YES") && (
-                      <tr>
-                        <td colSpan={2} className='p-0'>
-                          <table className='min-w-full table-auto border-collapse'>
-                            <thead className='bg-gray-100'>
-                              <tr>
-                                <th className='p-2 text-xs font-semibold text-gray-700 text-left'>
-                                  Participant
-                                </th>
-                                <th className='p-2 text-xs font-semibold text-gray-700 text-left'>
-                                  Category
-                                </th>
-                                <th className='p-2 text-xs font-semibold text-gray-700 text-left'>
-                                  Amount
-                                </th>
-                                {formValues?.couponCode && (
-                                  <th className='p-2 text-xs font-semibold text-gray-700 text-left'>
-                                    Coupon
-                                  </th>
-                                )}
-                              </tr>
-                            </thead>
-                            <tbody className='divide-y divide-gray-200'>
-                              {formValues?.registeredUsers?.map(
-                                (user, index) => {
-                                  const category = event?.category?.find(
-                                    (item) => item?.name === user?.categoryName
-                                  );
-                                  const coupon = coupons?.find(
-                                    (item) =>
-                                      item?.couponCode === user.couponCode
-                                  );
-
-                                  return (
-                                    <tr key={index} className='bg-white'>
-                                      <td className='p-2 text-xs text-gray-700 whitespace-nowrap'>
-                                        Participant {index + 1}
-                                      </td>
-                                      <td className='p-2 text-xs text-gray-700 whitespace-nowrap'>
-                                        {user?.categoryName}
-                                      </td>
-                                      <td className='p-2 text-xs text-gray-700 whitespace-nowrap'>
-                                        ₹ {category?.amount || "0"}
-                                      </td>
-                                      {formValues?.couponCode && (
-                                        <td className='p-2 text-xs text-gray-700 whitespace-nowrap'>
-                                          {coupon?.couponCode || ""}
-                                        </td>
-                                      )}
-                                    </tr>
-                                  );
-                                }
-                              )}
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                    )}
-
-                  {formValues?.membershipId && (
-                    <tr className='bg-white'>
-                      <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                        Membership Id:
-                      </th>
-                      <td className='p-3 text-right font-semibold'>
-                        {formValues?.membershipId}
-                      </td>
-                    </tr>
-                  )}
-
-                  {formValues?.registeredUsers &&
-                    formValues?.registeredUsers[0]?.teamName && (
-                      <>
-                        <tr className='bg-gray-50'>
-                          <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                            Team Name:
-                          </th>
-                          <td className='p-3 text-right font-semibold'>
-                            {formValues?.registeredUsers[0]?.teamName}
-                          </td>
-                        </tr>
-                        <tr className='bg-white'>
-                          <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                            Team Contact Person Number:
-                          </th>
-                          <td className='p-3 text-right font-semibold'>
-                            {
-                              formValues?.registeredUsers[0]
-                                ?.teamContactPersonNumber
-                            }
-                          </td>
-                        </tr>
-                      </>
-                    )}
 
                   {formValues?.couponCode && (
                     <>

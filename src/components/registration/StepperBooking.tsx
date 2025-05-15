@@ -6,10 +6,11 @@ import { toast } from "react-hot-toast";
 import CustomerInfo from "@/components/registration/CustomerInfo";
 import PaymentInfo from "@/components/registration/PaymentInfo";
 import OrderSummary from "@/components/registration/OrderSubmittedInfo";
-import { baseUrl } from '@/lib/apiConfig';
-import { getEventBySlug} from '@/lib/api';
-import { getAllCoupons } from '@/lib/useCoupons';
-
+import {
+  getEventBySlug,
+  getAllCoupons,
+  registerUserForEvent,
+} from "@/lib/backendApi";
 interface Event {
   id: string;
   eventName: string;
@@ -94,9 +95,6 @@ interface FormValues {
   age?: number;
 }
 
-/**
- * Custom hook to fetch event data by slug
- */
 const useEvent = (eventSlug: string) => {
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -128,7 +126,9 @@ const useEvent = (eventSlug: string) => {
 
 const useCoupons = (eventId: string | undefined) => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [findEarlyBirdCoupon, setFindEarlyBirdCoupon] = useState<Coupon | null>(null);
+  const [findEarlyBirdCoupon, setFindEarlyBirdCoupon] = useState<Coupon | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -157,12 +157,15 @@ const useCoupons = (eventId: string | undefined) => {
 };
 
 const BlockingLoader: React.FC = () => (
-  <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+  <div className='fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50'>
+    <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600'></div>
   </div>
 );
 
-const calculateAge = (dateOfBirth: string, eventDate: string | undefined): number => {
+const calculateAge = (
+  dateOfBirth: string,
+  eventDate: string | undefined
+): number => {
   if (!dateOfBirth) return 0;
   const birthDate = new Date(dateOfBirth);
   const compareDate = eventDate ? new Date(eventDate) : new Date();
@@ -177,23 +180,55 @@ const calculateAge = (dateOfBirth: string, eventDate: string | undefined): numbe
   return age;
 };
 
-const registerUser = async (formData: FormData) => {
+const registerUser = async (
+  formData: FormData,
+  setFormValues: React.Dispatch<React.SetStateAction<FormValues | null>>,
+  setFormSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
+  setCurrentStep: React.Dispatch<React.SetStateAction<number>>,
+  currentStep: number,
+  formik: any
+) => {
   try {
-    const response = await fetch(`${baseUrl}users/register`, {
-      method: "POST",
-      body: formData,
-    });
+    console.log("Submitting form data:", formData);
+
+    const response = await registerUserForEvent(formData);
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error("Registration error:", errorData);
       throw new Error(errorData.error || "Registration failed");
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    console.log("Server response:", responseData);
+
+    if (responseData?.data) {
+      console.log("Data received from API:", responseData.data);
+
+      setFormValues(responseData.data);
+      console.log("Setting form values:", responseData.data);
+
+      setFormSubmitted(true);
+      setCurrentStep(currentStep + 1);
+
+      const updatedValues = {
+        ...formik.values,
+        ...responseData.data,
+      };
+
+      console.log("Updated formik values:", updatedValues);
+      formik.setValues(updatedValues);
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    return responseData;
   } catch (error) {
+    console.error("Error during registration:", error);
     throw error;
   }
 };
+
 
 const StepperBooking: React.FC = () => {
   const { slug } = useParams();
@@ -209,11 +244,14 @@ const StepperBooking: React.FC = () => {
   const [gender, setGender] = useState<string>("");
   const [matchedAgeBracket, setMatchedAgeBracket] = useState<string>("");
   const [buttonClicked, setButtonClicked] = useState<boolean>(false);
-  const [errorList, setErrorList] = useState<string[]>([]);  
+  const [errorList, setErrorList] = useState<string[]>([]);
   const { event, isLoading: isEventLoading, error } = useEvent(eventSlug);
   const { coupons, findEarlyBirdCoupon } = useCoupons(event?.id);
 
-  const getInitialFormValues = (event: Event | null, findEarlyBirdCoupon: Coupon | null): FormValues => ({
+  const getInitialFormValues = (
+    event: Event | null,
+    findEarlyBirdCoupon: Coupon | null
+  ): FormValues => ({
     firstName: "",
     lastName: "",
     email: "",
@@ -283,7 +321,7 @@ const StepperBooking: React.FC = () => {
         .test(
           "not-same-as-mobile",
           "Contact number and emergency contact number cannot be the same.",
-          function(value) {
+          function (value) {
             return value !== this.parent.mobileNumber;
           }
         ),
@@ -332,7 +370,14 @@ const StepperBooking: React.FC = () => {
           }
         });
 
-        const response = await registerUser(formData);
+        const response = await registerUser(
+          formData,
+          setFormValues,
+          setFormSubmitted,
+          setCurrentStep,
+          currentStep,
+          formik
+        );
 
         if (response?.data) {
           const updatedValues = {
@@ -407,16 +452,14 @@ const StepperBooking: React.FC = () => {
       );
 
       if ((selectedCategory?.ageBracket ?? []).length > 0) {
-        const matchedBracket = selectedCategory?.ageBracket?.find(
-          (bracket) => {
-            const isAgeInRange =
-              age >= bracket.minimumAge && age <= bracket.maximumAge;
-            const isGenderMatch =
-              bracket.gender === "BOTH" ||
-              bracket.gender === gender.toUpperCase();
-            return isAgeInRange && isGenderMatch;
-          }
-        );
+        const matchedBracket = selectedCategory?.ageBracket?.find((bracket) => {
+          const isAgeInRange =
+            age >= bracket.minimumAge && age <= bracket.maximumAge;
+          const isGenderMatch =
+            bracket.gender === "BOTH" ||
+            bracket.gender === gender.toUpperCase();
+          return isAgeInRange && isGenderMatch;
+        });
 
         if (matchedBracket) {
           setMatchedAgeBracket(
@@ -488,7 +531,6 @@ const StepperBooking: React.FC = () => {
     setErrorList(Object.keys(formik.errors));
   }, [formik.errors]);
 
-
   const steps = [
     {
       title: "Personal Details",
@@ -505,7 +547,7 @@ const StepperBooking: React.FC = () => {
   ];
 
   const renderStepContent = () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 0:
         return (
           <CustomerInfo
@@ -520,21 +562,26 @@ const StepperBooking: React.FC = () => {
           />
         );
       case 1:
-        return formValues && event && (
-          <PaymentInfo
-            formValues={formValues}
-            payAmount={event.category?.[0]?.amount}
-            event={event}
-            coupons={coupons}
-          />
+        return (
+          formValues &&
+          event && (
+            <PaymentInfo
+              formValues={formValues}
+              payAmount={event.category?.[0]?.amount}
+              event={event}
+              coupons={coupons}
+            />
+          )
         );
       case 2:
-        return formValues && (
-          <OrderSummary
-            formValues={formValues}
-            eventName={event?.eventName}
-            event={event}
-          />
+        return (
+          formValues && (
+            <OrderSummary
+              formValues={formValues}
+              eventName={event?.eventName}
+              event={event}
+            />
+          )
         );
       default:
         return null;
@@ -545,39 +592,45 @@ const StepperBooking: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center p-8 max-w-md">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-gray-700">{error}</p>
+      <div className='flex items-center justify-center h-screen'>
+        <div className='text-center p-8 max-w-md'>
+          <h2 className='text-xl font-bold text-red-600 mb-4'>Error</h2>
+          <p className='text-gray-700'>{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-6">
-      <div className="w-full mb-8 flex justify-center">
-        <div className="flex items-center w-full max-w-3xl">
+    <div className='w-full max-w-5xl mx-auto px-4 py-6'>
+      <div className='w-full mb-8 flex justify-center'>
+        <div className='flex items-center w-full max-w-3xl'>
           {steps.map((step, index) => (
             <React.Fragment key={index}>
-              <div className={`flex flex-col items-center ${index <= currentStep ? 'text-blue-600' : 'text-gray-400'}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
-                  index < currentStep 
-                    ? 'bg-blue-600 text-white border-blue-600' 
-                    : index === currentStep
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-gray-300 text-gray-400'
-                }`}>
-                  {index < currentStep ? '✓' : step.stepNo}
+              <div
+                className={`flex flex-col items-center ${
+                  index <= currentStep ? "text-blue-600" : "text-gray-400"
+                }`}
+              >
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                    index < currentStep
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : index === currentStep
+                      ? "border-blue-600 text-blue-600"
+                      : "border-gray-300 text-gray-400"
+                  }`}
+                >
+                  {index < currentStep ? "✓" : step.stepNo}
                 </div>
-                <div className="text-xs mt-1">{step.title}</div>
+                <div className='text-xs mt-1'>{step.title}</div>
               </div>
-              
+
               {index < steps.length - 1 && (
-                <div className="flex-1 h-0.5 mx-2 bg-gray-300">
-                  <div 
-                    className="h-full bg-blue-600" 
-                    style={{ width: index < currentStep ? '100%' : '0%' }}
+                <div className='flex-1 h-0.5 mx-2 bg-gray-300'>
+                  <div
+                    className='h-full bg-blue-600'
+                    style={{ width: index < currentStep ? "100%" : "0%" }}
                   ></div>
                 </div>
               )}
@@ -586,19 +639,19 @@ const StepperBooking: React.FC = () => {
         </div>
       </div>
 
-      <div className="mb-10 bg-white p-6 rounded-lg shadow-md">
+      <div className='mb-10 bg-white p-6 rounded-lg shadow-md'>
         {renderStepContent()}
       </div>
 
-      <div className="mt-8 flex flex-col md:flex-row gap-4">
+      <div className='mt-8 flex flex-col md:flex-row gap-4'>
         {buttonClicked && errorList.length > 0 && currentStep === 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full">
-            <h3 className="text-red-700 font-medium mb-2">
+          <div className='bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full'>
+            <h3 className='text-red-700 font-medium mb-2'>
               Please correct the following errors:
             </h3>
-            <ul className="list-disc pl-5">
+            <ul className='list-disc pl-5'>
               {errorList.map((field, index) => (
-                <li className="text-red-600 text-sm" key={index}>
+                <li className='text-red-600 text-sm' key={index}>
                   {formik.errors[field as keyof typeof formik.errors]
                     ? String(formik.errors[field as keyof typeof formik.errors])
                     : `${field} is required`}
@@ -608,12 +661,12 @@ const StepperBooking: React.FC = () => {
           </div>
         )}
 
-        <div className="flex gap-4 ml-auto">
+        <div className='flex gap-4 ml-auto'>
           {currentStep > 0 && (
             <button
-              className="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+              className='px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50'
               onClick={handlePrevStep}
-              type="button"
+              type='button'
             >
               Back
             </button>
@@ -621,19 +674,19 @@ const StepperBooking: React.FC = () => {
 
           {currentStep === 0 ? (
             <button
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
+              className='px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50'
               onClick={handleNextStep}
               disabled={loading}
-              type="button"
+              type='button'
             >
               Next
             </button>
           ) : currentStep === 1 ? (
             <button
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
+              className='px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50'
               onClick={handleRegisterClick}
               disabled={loading}
-              type="button"
+              type='button'
             >
               {loading ? "Processing..." : "Register"}
             </button>

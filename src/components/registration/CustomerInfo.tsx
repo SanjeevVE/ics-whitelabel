@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FormikProps } from "formik";
-import Button from "../../components/ui/Button";
 
 type CustomerInfoProps = {
   eventCategory: any;

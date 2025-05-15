@@ -4,16 +4,8 @@ const nextConfig = {
   images: {
     domains: [
       'novarace.s3.amazonaws.com',
-
+      'novarace.s3.us-east-2.amazonaws.com', 
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api-proxy/:path*',
-        destination: 'https://novarace.in/api/:path*', // Proxy to the actual API
-      },
-    ];
   },
 };
 
