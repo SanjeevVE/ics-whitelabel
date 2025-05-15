@@ -10,7 +10,7 @@ import {
   getEventBySlug,
   getAllCoupons,
   registerUserForEvent,
-} from "@/lib/backendApi";
+} from "@/lib/backendApis";
 interface Event {
   id: string;
   eventName: string;

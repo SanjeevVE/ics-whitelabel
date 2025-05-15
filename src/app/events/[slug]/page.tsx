@@ -23,7 +23,7 @@ import SelfiBooth from "../../../../public/img/event-landing-page/selfi.png";
 import OnlinePhotos from "../../../../public/img/event-landing-page/onlinephotos.png";
 import FinisherShield from "../../../../public/img/event-landing-page/shield.png";
 
-import { getEventBySlug } from "@/lib/backendApi";
+import { getEventBySlug } from "@/lib/backendApis";
 
 interface CategoryDetail {
   amount: string;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import EventList from "@/components/events/EventList";
 import Loader from "@/components/common/Loader";
-import { fetchEvents } from "@/lib/backendApi";
+import { fetchEvents } from "@/lib/backendApis";
 import { Event } from "@/lib/types";
 
 export default function EventsPage() {
