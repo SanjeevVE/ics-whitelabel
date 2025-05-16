@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { toast } from "react-hot-toast";
-import CustomerInfo from "@/components/registration/CustomerInfo";
-import PaymentInfo from "@/components/registration/PaymentInfo";
-import OrderSummary from "@/components/registration/OrderSubmittedInfo";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { toast } from 'react-hot-toast';
+import CustomerInfo from '@/components/registration/CustomerInfo';
+import PaymentInfo from '@/components/registration/PaymentInfo';
 import {
   getEventBySlug,
   getAllCoupons,
   registerUserForEvent,
-} from "@/lib/backendApis";
+} from '@/lib/backendApis';
+
 interface Event {
   id: string;
   eventName: string;
@@ -93,6 +93,7 @@ interface FormValues {
   eventTag: string;
   eventStatus: string;
   age?: number;
+  platformFee?: number;
 }
 
 const useEvent = (eventSlug: string) => {
@@ -107,12 +108,12 @@ const useEvent = (eventSlug: string) => {
 
         const response = await getEventBySlug(eventSlug);
         if (!response || !response.data) {
-          throw new Error("Failed to fetch event data");
+          throw new Error('Failed to fetch event data');
         }
         setEvent(response.data);
       } catch (error) {
-        console.error("Error fetching event:", error);
-        setError("Failed to load event data. Please try again later.");
+        console.error('Error fetching event:', error);
+        setError('Failed to load event data. Please try again later.');
       } finally {
         setIsLoading(false);
       }
@@ -136,17 +137,17 @@ const useCoupons = (eventId: string | undefined) => {
         if (!eventId) return;
         const response = await getAllCoupons(eventId);
         if (!response.ok) {
-          throw new Error("Failed to fetch coupons");
+          throw new Error('Failed to fetch coupons');
         }
         const data = await response.json();
         setCoupons(data);
 
         const earlyBird = data.find(
-          (coupon: Coupon) => coupon.couponType === "EARLY_BIRD"
+          (coupon: Coupon) => coupon.couponType === 'EARLY_BIRD'
         );
         setFindEarlyBirdCoupon(earlyBird || null);
       } catch (error) {
-        console.error("Error fetching coupons:", error);
+        console.error('Error fetching coupons:', error);
       }
     };
 
@@ -157,8 +158,8 @@ const useCoupons = (eventId: string | undefined) => {
 };
 
 const BlockingLoader: React.FC = () => (
-  <div className='fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50'>
-    <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600'></div>
+  <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
   </div>
 );
 
@@ -180,6 +181,7 @@ const calculateAge = (
   return age;
 };
 
+// FIX: Modified to handle response properly and with better error handling
 const registerUser = async (
   formData: FormData,
   setFormValues: React.Dispatch<React.SetStateAction<FormValues | null>>,
@@ -189,50 +191,100 @@ const registerUser = async (
   formik: any
 ) => {
   try {
-    console.log("Submitting form data:", formData);
+    console.log('Submitting form data:', formData);
 
+    // Get the API response
     const response = await registerUserForEvent(formData);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Registration error:", errorData);
-      throw new Error(errorData.error || "Registration failed");
+    // FIX: Check if response is valid and check if it has a json method
+    if (!response) {
+      throw new Error('No response received from server');
     }
 
-    const responseData = await response.json();
-    console.log("Server response:", responseData);
+    // FIX: Handle potential non-JSON responses
+    let responseData;
+    try {
+      // Check if the response has a json method before calling it
+      if (typeof response.json === 'function') {
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error ||
+              `Registration failed with status: ${response.status}`
+          );
+        }
+        responseData = await response.json();
+      } else {
+        // If response doesn't have json method, it might already be parsed data
+        responseData = response;
+      }
+    } catch (jsonError) {
+      console.error('Error parsing JSON response:', jsonError);
+      throw new Error('Failed to parse server response');
+    }
 
+    console.log('Server response:', responseData);
+
+    // FIX: Ensure responseData is valid before proceeding
+    if (!responseData) {
+      throw new Error('No data received from server');
+    }
+
+    // Check if the response has the expected data structure
     if (responseData?.data) {
-      console.log("Data received from API:", responseData.data);
+      // Log the data received from API for debugging
+      console.log('Data received from API:', responseData.data);
 
+      // Set form values with data from API response
       setFormValues(responseData.data);
-      console.log("Setting form values:", responseData.data);
+      console.log('Form values after update:', responseData.data);
 
+      // Mark form as submitted
       setFormSubmitted(true);
+
+      // Move to next step
       setCurrentStep(currentStep + 1);
 
+      // Update formik values with response data
       const updatedValues = {
         ...formik.values,
         ...responseData.data,
       };
 
-      console.log("Updated formik values:", updatedValues);
+      console.log('Updated formik values:', updatedValues);
       formik.setValues(updatedValues);
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // If responseData doesn't have expected structure
+      console.warn(
+        "Response data missing expected 'data' property:",
+        responseData
+      );
+      // If there's order data in the response root, use that
+      if (responseData.id || responseData.orderId) {
+        setFormValues({ ...formik.values, ...responseData });
+        setFormSubmitted(true);
+        setCurrentStep(currentStep + 1);
+        formik.setValues({ ...formik.values, ...responseData });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error('Invalid response format from server');
+      }
     }
 
     return responseData;
-  } catch (error) {
-    console.error("Error during registration:", error);
+  } catch (error: any) {
+    console.error('Error during registration:', error);
+    toast.error(error?.message || 'Registration failed');
     throw error;
   }
 };
 
-
 const StepperBooking: React.FC = () => {
   const { slug } = useParams();
-  const eventSlug = typeof slug === "string" ? slug : "";
+  const eventSlug = typeof slug === 'string' ? slug : '';
 
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formValues, setFormValues] = useState<FormValues | null>(null);
@@ -241,8 +293,8 @@ const StepperBooking: React.FC = () => {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [categoryMinimumAge, setCategoryMinimumAge] = useState<number>(0);
   const [categoryMaximumAge, setCategoryMaximumAge] = useState<number>(0);
-  const [gender, setGender] = useState<string>("");
-  const [matchedAgeBracket, setMatchedAgeBracket] = useState<string>("");
+  const [gender, setGender] = useState<string>('');
+  const [matchedAgeBracket, setMatchedAgeBracket] = useState<string>('');
   const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const [errorList, setErrorList] = useState<string[]>([]);
   const { event, isLoading: isEventLoading, error } = useEvent(eventSlug);
@@ -252,83 +304,84 @@ const StepperBooking: React.FC = () => {
     event: Event | null,
     findEarlyBirdCoupon: Coupon | null
   ): FormValues => ({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobileNumber: "",
-    gender: "",
-    dateOfBirth: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    mobileNumber: '',
+    gender: '',
+    dateOfBirth: '',
     eventId: event?.id || null,
-    eventName: event?.eventName || "",
-    eventType: event?.eventType || "",
-    eventSlug: event?.slug || "",
+    eventName: event?.eventName || '',
+    eventType: event?.eventType || '',
+    eventSlug: event?.slug || '',
     registrationOpenDate: event?.regOpenDate || null,
     registrationCloseDate: event?.regCloseDate || null,
     eventDate: event?.date || null,
-    location: event?.location || "",
-    tShirtSize: "",
-    address: "",
-    city: "",
-    pincode: "",
-    state: "",
-    country: event?.location?.split(", ").pop() || "",
-    emergencyContactName: "",
-    emergencyContactNumber: "",
-    categoryName: "",
-    couponCode: findEarlyBirdCoupon?.couponCode || "",
-    runnerClub: "None",
-    company: "None",
-    bibDistributionLocation: "",
-    nameOfTheBib: "",
-    bloodGroup: "",
-    educationInstitution: "",
-    medicalConditions: "",
+    location: event?.location || '',
+    tShirtSize: '',
+    address: '',
+    city: '',
+    pincode: '',
+    state: '',
+    country: event?.location?.split(', ').pop() || '',
+    emergencyContactName: '',
+    emergencyContactNumber: '',
+    categoryName: '',
+    couponCode: findEarlyBirdCoupon?.couponCode || '',
+    runnerClub: 'None',
+    company: 'None',
+    bibDistributionLocation: '',
+    nameOfTheBib: '',
+    bloodGroup: '',
+    educationInstitution: '',
+    medicalConditions: '',
     termsAndConditions: false,
-    hearAboutUs: "",
-    race: event?.race?.[0] || "",
-    distance: "",
-    eventTag: event?.tag || "",
-    eventStatus: event?.status || "",
+    hearAboutUs: '',
+    race: event?.race?.[0] || '',
+    distance: '',
+    eventTag: event?.tag || '',
+    eventStatus: event?.status || '',
+    platformFee: 0, // Default platform fee
   });
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: getInitialFormValues(event, findEarlyBirdCoupon),
     validationSchema: Yup.object({
-      firstName: Yup.string().required("First Name is required"),
-      lastName: Yup.string().required("Last Name is required"),
-      email: Yup.string().email("Invalid email").required("Email is required"),
+      firstName: Yup.string().required('First Name is required'),
+      lastName: Yup.string().required('Last Name is required'),
+      email: Yup.string().email('Invalid email').required('Email is required'),
       mobileNumber: Yup.string()
-        .required("Mobile Number is required")
+        .required('Mobile Number is required')
         .matches(/^(?!0|(\+91))\d{10}$/, {
-          message: "Mobile Number should be 10 digits without 0 or +91 prefix",
+          message: 'Mobile Number should be 10 digits without 0 or +91 prefix',
         }),
-      gender: Yup.string().required("Gender is required"),
+      gender: Yup.string().required('Gender is required'),
       dateOfBirth: Yup.date()
-        .max(new Date(), "Date of Birth must be in the past")
-        .required("Date of Birth is required"),
-      tShirtSize: Yup.string().required("T-Shirt Size is required"),
-      address: Yup.string().required("Address is required"),
-      city: Yup.string().required("City is required"),
-      pincode: Yup.string().required("Pincode is required"),
-      state: Yup.string().required("State is required"),
-      country: Yup.string().required("Country is required"),
+        .max(new Date(), 'Date of Birth must be in the past')
+        .required('Date of Birth is required'),
+      tShirtSize: Yup.string().required('T-Shirt Size is required'),
+      address: Yup.string().required('Address is required'),
+      city: Yup.string().required('City is required'),
+      pincode: Yup.string().required('Pincode is required'),
+      state: Yup.string().required('State is required'),
+      country: Yup.string().required('Country is required'),
       emergencyContactName: Yup.string().required(
-        "Emergency Contact Name is required"
+        'Emergency Contact Name is required'
       ),
       emergencyContactNumber: Yup.string()
-        .required("Emergency Contact Number is required")
+        .required('Emergency Contact Number is required')
         .test(
-          "not-same-as-mobile",
-          "Contact number and emergency contact number cannot be the same.",
+          'not-same-as-mobile',
+          'Contact number and emergency contact number cannot be the same.',
           function (value) {
             return value !== this.parent.mobileNumber;
           }
         ),
-      categoryName: Yup.string().required("Category Name is required"),
+      categoryName: Yup.string().required('Category Name is required'),
       termsAndConditions: Yup.boolean()
-        .oneOf([true], "You must agree to the terms")
-        .required("Terms acceptance is required"),
+        .oneOf([true], 'You must agree to the terms')
+        .required('Terms acceptance is required'),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
@@ -336,78 +389,108 @@ const StepperBooking: React.FC = () => {
         const age = calculateAge(values.dateOfBirth, event?.date);
 
         const formData = new FormData();
-        for (const key in values) {
-          const value = values[key as keyof typeof values];
-          if (value !== null && value !== undefined) {
+
+        // Add all the basic form fields
+        Object.entries(values).forEach(([key, value]) => {
+          // Skip event fields as we'll handle them separately
+          if (
+            value !== null &&
+            value !== undefined &&
+            ![
+              'eventId',
+              'eventName',
+              'eventType',
+              'eventSlug',
+              'registrationOpenDate',
+              'registrationCloseDate',
+              'eventDate',
+              'location',
+              'race',
+              'eventTag',
+              'eventStatus',
+              'nameOfTheBib',
+            ].includes(key)
+          ) {
             formData.append(key, String(value));
-          }
-        }
-
-        formData.append("age", age.toString());
-        formData.append(
-          "nameOfTheBib",
-          values.nameOfTheBib || values.firstName
-        );
-
-        const eventSpecificFields = [
-          "eventId",
-          "eventName",
-          "eventType",
-          "eventSlug",
-          "registrationOpenDate",
-          "registrationCloseDate",
-          "eventDate",
-          "location",
-          "race",
-          "eventTag",
-          "eventStatus",
-        ];
-
-        eventSpecificFields.forEach((field) => {
-          const value = values[field as keyof typeof values];
-          if (value !== null && value !== undefined) {
-            formData.append(field, String(value));
           }
         });
 
-        const response = await registerUser(
-          formData,
-          setFormValues,
-          setFormSubmitted,
-          setCurrentStep,
-          currentStep,
-          formik
+        // Add calculated age
+        formData.append('age', age.toString());
+
+        // Handle the nameOfTheBib field
+        formData.append(
+          'nameOfTheBib',
+          values.nameOfTheBib || `${values.firstName} ${values.lastName}`
         );
 
-        if (response?.data) {
-          const updatedValues = {
-            ...values,
-            ...response.data,
-            couponCode: response.data.couponCode || values.couponCode,
-            runnerClub: response.data.runnerClub || values.runnerClub,
-            company: response.data.company || values.company,
-            eventId: event?.id,
-            eventName: event?.eventName,
-            eventType: event?.eventType,
-            eventSlug: event?.slug,
-            registrationOpenDate: event?.regOpenDate,
-            registrationCloseDate: event?.regCloseDate,
-            eventDate: event?.date,
-            location: event?.location,
-            race: event?.race?.[0],
-            eventTag: event?.tag,
-            eventStatus: event?.status,
-          };
+        // Handle event-specific fields - ensure we're not sending arrays
+        if (event) {
+          formData.append('eventId', String(event.id));
+          formData.append('eventName', String(event.eventName));
+          formData.append('eventType', String(event.eventType || ''));
+          formData.append('eventSlug', String(event.slug));
+          formData.append(
+            'registrationOpenDate',
+            String(event.regOpenDate || '')
+          );
+          formData.append(
+            'registrationCloseDate',
+            String(event.regCloseDate || '')
+          );
+          formData.append('eventDate', String(event.date || ''));
+          formData.append('location', String(event.location || ''));
+          formData.append('race', String(values.race || event.race?.[0] || ''));
+          formData.append('eventTag', String(event.tag || ''));
+          formData.append('eventStatus', String(event.status || ''));
+        }
 
-          setFormValues(response.data);
-          setFormSubmitted(true);
-          setCurrentStep(currentStep + 1);
-          window.scrollTo({ top: 0, behavior: "smooth" });
+        // FIX: Wrap this in a try-catch to better handle errors
+        try {
+          const response = await registerUser(
+            formData,
+            setFormValues,
+            setFormSubmitted,
+            setCurrentStep,
+            currentStep,
+            formik
+          );
 
-          formik.setValues(updatedValues);
+          if (response) {
+            const responseData = response.data || response;
+            const updatedValues = {
+              ...values,
+              ...responseData,
+              couponCode: responseData.couponCode || values.couponCode,
+              runnerClub: responseData.runnerClub || values.runnerClub,
+              company: responseData.company || values.company,
+              platformFee: responseData.platformFee || 0,
+              // Make sure these are single values, not arrays
+              eventId: event?.id,
+              eventName: event?.eventName,
+              eventType: event?.eventType || '',
+              eventSlug: event?.slug,
+              registrationOpenDate: event?.regOpenDate,
+              registrationCloseDate: event?.regCloseDate,
+              eventDate: event?.date,
+              location: event?.location,
+              race: event?.race?.[0] || '',
+              eventTag: event?.tag || '',
+              eventStatus: event?.status || '',
+            };
+
+            setFormValues(updatedValues);
+            setFormSubmitted(true);
+            setCurrentStep(currentStep + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            formik.setValues(updatedValues);
+          }
+        } catch (registerError: any) {
+          toast.error(registerError?.message || 'Registration process failed');
         }
       } catch (error: any) {
-        toast.error(error?.message || "Registration failed");
+        toast.error(error?.message || 'Registration failed');
       } finally {
         setLoading(false);
         setSubmitting(false);
@@ -431,7 +514,7 @@ const StepperBooking: React.FC = () => {
         setCategoryMinimumAge(selectedCategory.minimumAge);
         setCategoryMaximumAge(selectedCategory.maximumAge);
         setGender(selectedCategory.gender);
-        formik.setFieldValue("distance", selectedCategory.distance || "");
+        formik.setFieldValue('distance', selectedCategory.distance || '');
       }
     }
   }, [event, formik.values.categoryName]);
@@ -456,7 +539,7 @@ const StepperBooking: React.FC = () => {
           const isAgeInRange =
             age >= bracket.minimumAge && age <= bracket.maximumAge;
           const isGenderMatch =
-            bracket.gender === "BOTH" ||
+            bracket.gender === 'BOTH' ||
             bracket.gender === gender.toUpperCase();
           return isAgeInRange && isGenderMatch;
         });
@@ -480,36 +563,17 @@ const StepperBooking: React.FC = () => {
   ]);
 
   useEffect(() => {
-    setMatchedAgeBracket("");
+    setMatchedAgeBracket('');
   }, [formik.values.categoryName]);
 
-  const isMatched = matchedAgeBracket.startsWith("You are registering");
+  const isMatched = matchedAgeBracket.startsWith('You are registering');
 
-  const handleNextStep = () => {
+  // This function handles the CustomerInfo form completion and API call
+  const handleCustomerInfoSubmit = () => {
     setButtonClicked(true);
     formik.validateForm().then((errors) => {
       if (Object.keys(errors).length === 0) {
-        setFormValues({
-          ...formik.values,
-          age: calculateAge(formik.values.dateOfBirth, event?.date),
-        });
-        setCurrentStep(currentStep + 1);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        formik.setTouched(
-          Object.keys(errors).reduce((acc, key) => {
-            acc[key as keyof typeof errors] = true;
-            return acc;
-          }, {} as Record<string, boolean>)
-        );
-      }
-    });
-  };
-
-  const handleRegisterClick = () => {
-    setButtonClicked(true);
-    formik.validateForm().then((errors) => {
-      if (Object.keys(errors).length === 0) {
+        // Execute the API call upon validation success
         formik.handleSubmit();
       } else {
         formik.setTouched(
@@ -524,7 +588,7 @@ const StepperBooking: React.FC = () => {
 
   const handlePrevStep = () => {
     setCurrentStep(currentStep - 1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -533,16 +597,16 @@ const StepperBooking: React.FC = () => {
 
   const steps = [
     {
-      title: "Personal Details",
-      stepNo: "1",
+      title: 'Personal Details',
+      stepNo: '1',
     },
     {
-      title: "Payment Details",
-      stepNo: "2",
+      title: 'Payment Details',
+      stepNo: '2',
     },
     {
-      title: "Order Confirmation",
-      stepNo: "3",
+      title: 'Order Confirmation',
+      stepNo: '3',
     },
   ];
 
@@ -573,16 +637,7 @@ const StepperBooking: React.FC = () => {
             />
           )
         );
-      case 2:
-        return (
-          formValues && (
-            <OrderSummary
-              formValues={formValues}
-              eventName={event?.eventName}
-              event={event}
-            />
-          )
-        );
+
       default:
         return null;
     }
@@ -592,45 +647,45 @@ const StepperBooking: React.FC = () => {
 
   if (error) {
     return (
-      <div className='flex items-center justify-center h-screen'>
-        <div className='text-center p-8 max-w-md'>
-          <h2 className='text-xl font-bold text-red-600 mb-4'>Error</h2>
-          <p className='text-gray-700'>{error}</p>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center p-8 max-w-md">
+          <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
+          <p className="text-gray-700">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='w-full max-w-5xl mx-auto px-4 py-6'>
-      <div className='w-full mb-8 flex justify-center'>
-        <div className='flex items-center w-full max-w-3xl'>
+    <div className="w-full max-w-5xl mx-auto px-4 py-6">
+      <div className="w-full mb-8 flex justify-center">
+        <div className="flex items-center w-full max-w-3xl">
           {steps.map((step, index) => (
             <React.Fragment key={index}>
               <div
                 className={`flex flex-col items-center ${
-                  index <= currentStep ? "text-blue-600" : "text-gray-400"
+                  index <= currentStep ? 'text-blue-600' : 'text-gray-400'
                 }`}
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
                     index < currentStep
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? 'bg-blue-600 text-white border-blue-600'
                       : index === currentStep
-                      ? "border-blue-600 text-blue-600"
-                      : "border-gray-300 text-gray-400"
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-gray-300 text-gray-400'
                   }`}
                 >
-                  {index < currentStep ? "✓" : step.stepNo}
+                  {index < currentStep ? '✓' : step.stepNo}
                 </div>
-                <div className='text-xs mt-1'>{step.title}</div>
+                <div className="text-xs mt-1">{step.title}</div>
               </div>
 
               {index < steps.length - 1 && (
-                <div className='flex-1 h-0.5 mx-2 bg-gray-300'>
+                <div className="flex-1 h-0.5 mx-2 bg-gray-300">
                   <div
-                    className='h-full bg-blue-600'
-                    style={{ width: index < currentStep ? "100%" : "0%" }}
+                    className="h-full bg-blue-600"
+                    style={{ width: index < currentStep ? '100%' : '0%' }}
                   ></div>
                 </div>
               )}
@@ -639,19 +694,19 @@ const StepperBooking: React.FC = () => {
         </div>
       </div>
 
-      <div className='mb-10 bg-white p-6 rounded-lg shadow-md'>
+      <div className="mb-10 bg-white p-6 rounded-lg shadow-md">
         {renderStepContent()}
       </div>
 
-      <div className='mt-8 flex flex-col md:flex-row gap-4'>
+      <div className="mt-8 flex flex-col md:flex-row gap-4">
         {buttonClicked && errorList.length > 0 && currentStep === 0 && (
-          <div className='bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full'>
-            <h3 className='text-red-700 font-medium mb-2'>
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full">
+            <h3 className="text-red-700 font-medium mb-2">
               Please correct the following errors:
             </h3>
-            <ul className='list-disc pl-5'>
+            <ul className="list-disc pl-5">
               {errorList.map((field, index) => (
-                <li className='text-red-600 text-sm' key={index}>
+                <li className="text-red-600 text-sm" key={index}>
                   {formik.errors[field as keyof typeof formik.errors]
                     ? String(formik.errors[field as keyof typeof formik.errors])
                     : `${field} is required`}
@@ -661,34 +716,15 @@ const StepperBooking: React.FC = () => {
           </div>
         )}
 
-        <div className='flex gap-4 ml-auto'>
-          {currentStep > 0 && (
-            <button
-              className='px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50'
-              onClick={handlePrevStep}
-              type='button'
-            >
-              Back
-            </button>
-          )}
-
+        <div className="flex gap-4 ml-auto">
           {currentStep === 0 ? (
             <button
-              className='px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50'
-              onClick={handleNextStep}
+              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
+              onClick={handleCustomerInfoSubmit}
               disabled={loading}
-              type='button'
+              type="button"
             >
-              Next
-            </button>
-          ) : currentStep === 1 ? (
-            <button
-              className='px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50'
-              onClick={handleRegisterClick}
-              disabled={loading}
-              type='button'
-            >
-              {loading ? "Processing..." : "Register"}
+              {loading ? 'Processing...' : 'Register'}
             </button>
           ) : null}
         </div>

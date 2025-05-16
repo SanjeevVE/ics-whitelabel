@@ -55,7 +55,6 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   isEmailVerificationEnabled = false,
   isSmsVerificationEnabled = false,
   findCoupon,
-  onRegisterClick,
 }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showPopupPhoto, setShowPopupPhoto] = useState(false);
@@ -223,7 +222,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
                   {hoveredCategory === category && (
                     <div className='absolute z-10 bg-white shadow-lg rounded-md p-3 border border-gray-200 text-sm w-64'>
                       <div className='font-medium'>
-                        Registration Eligibility Criteria for{" "}
+                        Registration Eligibility Criteria for
                         <span className='font-bold'>
                           {category.distance} KM
                         </span>
