@@ -136,10 +136,14 @@ const useCoupons = (eventId: string | undefined) => {
       try {
         if (!eventId) return;
         const response = await getAllCoupons(eventId);
-        if (!response.ok) {
+        let data;
+        if (response.ok && typeof response.json === 'function') {
+          data = await response.json();
+        } else if (response.data) {
+          data = response.data;
+        } else {
           throw new Error('Failed to fetch coupons');
         }
-        const data = await response.json();
         setCoupons(data);
 
         const earlyBird = data.find(
@@ -181,7 +185,6 @@ const calculateAge = (
   return age;
 };
 
-// FIX: Modified to handle response properly and with better error handling
 const registerUser = async (
   formData: FormData,
   setFormValues: React.Dispatch<React.SetStateAction<FormValues | null>>,
@@ -191,20 +194,15 @@ const registerUser = async (
   formik: any
 ) => {
   try {
-    console.log('Submitting form data:', formData);
-
-    // Get the API response
     const response = await registerUserForEvent(formData);
 
-    // FIX: Check if response is valid and check if it has a json method
     if (!response) {
       throw new Error('No response received from server');
     }
 
-    // FIX: Handle potential non-JSON responses
     let responseData;
+
     try {
-      // Check if the response has a json method before calling it
       if (typeof response.json === 'function') {
         if (!response.ok) {
           const errorData = await response.json();
@@ -215,54 +213,30 @@ const registerUser = async (
         }
         responseData = await response.json();
       } else {
-        // If response doesn't have json method, it might already be parsed data
         responseData = response;
       }
     } catch (jsonError) {
-      console.error('Error parsing JSON response:', jsonError);
       throw new Error('Failed to parse server response');
     }
 
-    console.log('Server response:', responseData);
-
-    // FIX: Ensure responseData is valid before proceeding
     if (!responseData) {
       throw new Error('No data received from server');
     }
 
-    // Check if the response has the expected data structure
     if (responseData?.data) {
-      // Log the data received from API for debugging
-      console.log('Data received from API:', responseData.data);
-
-      // Set form values with data from API response
       setFormValues(responseData.data);
-      console.log('Form values after update:', responseData.data);
-
-      // Mark form as submitted
       setFormSubmitted(true);
-
-      // Move to next step
       setCurrentStep(currentStep + 1);
 
-      // Update formik values with response data
       const updatedValues = {
         ...formik.values,
         ...responseData.data,
       };
 
-      console.log('Updated formik values:', updatedValues);
       formik.setValues(updatedValues);
 
-      // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // If responseData doesn't have expected structure
-      console.warn(
-        "Response data missing expected 'data' property:",
-        responseData
-      );
-      // If there's order data in the response root, use that
       if (responseData.id || responseData.orderId) {
         setFormValues({ ...formik.values, ...responseData });
         setFormSubmitted(true);
@@ -273,10 +247,8 @@ const registerUser = async (
         throw new Error('Invalid response format from server');
       }
     }
-
     return responseData;
   } catch (error: any) {
-    console.error('Error during registration:', error);
     toast.error(error?.message || 'Registration failed');
     throw error;
   }
@@ -285,7 +257,6 @@ const registerUser = async (
 const StepperBooking: React.FC = () => {
   const { slug } = useParams();
   const eventSlug = typeof slug === 'string' ? slug : '';
-
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formValues, setFormValues] = useState<FormValues | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -306,6 +277,7 @@ const StepperBooking: React.FC = () => {
   ): FormValues => ({
     firstName: '',
     lastName: '',
+
     email: '',
     mobileNumber: '',
     gender: '',
@@ -390,9 +362,7 @@ const StepperBooking: React.FC = () => {
 
         const formData = new FormData();
 
-        // Add all the basic form fields
         Object.entries(values).forEach(([key, value]) => {
-          // Skip event fields as we'll handle them separately
           if (
             value !== null &&
             value !== undefined &&
@@ -415,16 +385,13 @@ const StepperBooking: React.FC = () => {
           }
         });
 
-        // Add calculated age
         formData.append('age', age.toString());
 
-        // Handle the nameOfTheBib field
         formData.append(
           'nameOfTheBib',
           values.nameOfTheBib || `${values.firstName} ${values.lastName}`
         );
 
-        // Handle event-specific fields - ensure we're not sending arrays
         if (event) {
           formData.append('eventId', String(event.id));
           formData.append('eventName', String(event.eventName));
@@ -445,7 +412,6 @@ const StepperBooking: React.FC = () => {
           formData.append('eventStatus', String(event.status || ''));
         }
 
-        // FIX: Wrap this in a try-catch to better handle errors
         try {
           const response = await registerUser(
             formData,
@@ -465,7 +431,6 @@ const StepperBooking: React.FC = () => {
               runnerClub: responseData.runnerClub || values.runnerClub,
               company: responseData.company || values.company,
               platformFee: responseData.platformFee || 0,
-              // Make sure these are single values, not arrays
               eventId: event?.id,
               eventName: event?.eventName,
               eventType: event?.eventType || '',
@@ -568,12 +533,10 @@ const StepperBooking: React.FC = () => {
 
   const isMatched = matchedAgeBracket.startsWith('You are registering');
 
-  // This function handles the CustomerInfo form completion and API call
   const handleCustomerInfoSubmit = () => {
     setButtonClicked(true);
     formik.validateForm().then((errors) => {
       if (Object.keys(errors).length === 0) {
-        // Execute the API call upon validation success
         formik.handleSubmit();
       } else {
         formik.setTouched(

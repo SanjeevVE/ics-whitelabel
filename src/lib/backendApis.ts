@@ -53,17 +53,17 @@ export const getEventBySlug = async (slug: string) => {
   }
 };
 
-export const getAllCoupons = async (eventId: string) => {
-  if (!eventId) return [];
-  try {
-    const response = await fetch(`${baseUrl}/coupons/getcoupons?eventId=${eventId}`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching coupons:", error);
-    return [];
-  }
-};
+// export const getAllCoupons = async (eventId: string) => {
+//   if (!eventId) return [];
+//   try {
+//     const response = await fetch(`${baseUrl}/coupons/getcoupons?eventId=${eventId}`);
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching coupons:", error);
+//     return [];
+//   }
+// };
 
 export const registerUserForEvent = async (formData: FormData) => {
   try {
