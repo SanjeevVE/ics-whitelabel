@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FormikProps } from "formik";
 import TermsAndConditionModal from "./TermsAndConditionModal";
+import { getRunnerClubs } from "../../lib/backendApis";
 
 type CustomerInfoProps = {
   eventCategory: any;
@@ -41,8 +42,12 @@ type CustomerInfoProps = {
   isMatched: boolean;
   isEmailVerificationEnabled?: boolean;
   isSmsVerificationEnabled?: boolean;
+
   findCoupon?: (couponCode: string) => Promise<void>;
+  earlyBirdCoupon: string;
   onRegisterClick?: () => void;
+  club?: string;
+  baseUrl?: string;
 };
 
 const CustomerInfo: React.FC<CustomerInfoProps> = ({
@@ -56,14 +61,25 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   isEmailVerificationEnabled = false,
   isSmsVerificationEnabled = false,
   findCoupon,
+  earlyBirdCoupon,
+  club,
+  baseUrl = "",
 }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showPopupPhoto, setShowPopupPhoto] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<any>(null);
-  const [showBibOthersField, setShowBibOthersField] = useState(false);
   const [previewImages, setPreviewImages] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-const [modalType, setModalType] = useState<"terms" | "privacy">("terms");
+  const [modalType, setModalType] = useState<"terms" | "privacy">("terms");
+
+  // Runner club related states
+  const [runnerClubs, setRunnerClubs] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showOthersField, setShowOthersField] = useState(false);
+  const [otherClubName, setOtherClubName] = useState("");
 
   const IndianStates = [
     "Andhra Pradesh",
@@ -104,15 +120,15 @@ const [modalType, setModalType] = useState<"terms" | "privacy">("terms");
     "Puducherry",
   ];
 
-const openTermsModal = () => {
-  setModalType("terms");
-  setIsModalOpen(true);
-};
+  const openTermsModal = () => {
+    setModalType("terms");
+    setIsModalOpen(true);
+  };
 
-const openPrivacyModal = () => {
-  setModalType("privacy");
-  setIsModalOpen(true);
-};
+  const openPrivacyModal = () => {
+    setModalType("privacy");
+    setIsModalOpen(true);
+  };
 
   const calculateAge = useMemo(() => {
     return (dateOfBirth: string) => {
@@ -159,27 +175,127 @@ const openPrivacyModal = () => {
   );
 
   useEffect(() => {
-    if (findCoupon && formik.values.couponCode) {
-      const checkCoupon = async () => {
-        if (formik.values.couponCode) {
-          await findCoupon(formik.values.couponCode);
-        }
-      };
-      checkCoupon();
-    }
-  }, [formik.values.couponCode, findCoupon]);
+    const fetchRunnerClubs = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getRunnerClubs();
 
-  useEffect(() => {
-    if (customSlug && !formik.values.country) {
-      if (customSlug.includes("india")) {
-        formik.setFieldValue("country", "India");
-      } else if (customSlug.includes("usa")) {
-        formik.setFieldValue("country", "United States");
-      } else {
-        formik.setFieldValue("country", "India");
+        let clubs = [];
+        if (
+          response &&
+          typeof response === "object" &&
+          "data" in response &&
+          Array.isArray((response as any).data)
+        ) {
+          clubs = (response as any).data;
+        }
+
+        const clubsWithOthers = [...clubs, { id: "others", name: "Others" }];
+        setRunnerClubs(clubsWithOthers);
+      } catch (error) {
+        console.error("Error fetching runner clubs:", error);
+        setRunnerClubs([{ id: "others", name: "Others" }]);
+      } finally {
+        setIsLoading(false);
       }
+    };
+
+    fetchRunnerClubs();
+  }, [eventCategory?.eventId]);
+
+  const handleClubSelect = (clubName: string) => {
+    setIsDropdownOpen(false);
+
+    if (clubName === "Others") {
+      setShowOthersField(true);
+      formik.setFieldValue("runnerClub", "");
+    } else {
+      setShowOthersField(false);
+      formik.setFieldValue("runnerClub", clubName);
     }
-  }, [customSlug, formik]);
+  };
+
+  const handleOtherClubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setOtherClubName(value);
+    formik.setFieldValue("runnerClub", value);
+  };
+
+  const renderRunnerClubField = () => {
+    return (
+      <>
+        <div className='relative'>
+          <div
+            className={`w-full p-2 border rounded-md flex justify-between items-center cursor-pointer ${
+              !formik.values.categoryName ? "bg-gray-100" : ""
+            }`}
+            onClick={() => {
+              if (formik.values.categoryName) {
+                setIsDropdownOpen(!isDropdownOpen);
+              }
+            }}
+          >
+            <span className='truncate'>
+              {formik.values.runnerClub || "Select Runner Club"}
+            </span>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              className='h-5 w-5'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M19 9l-7 7-7-7'
+              />
+            </svg>
+          </div>
+
+          {isDropdownOpen && (
+            <div className='absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto'>
+              {isLoading ? (
+                <div className='p-3 text-center text-gray-500'>
+                  Loading clubs...
+                </div>
+              ) : runnerClubs.length > 0 ? (
+                <div>
+                  {runnerClubs.map((club, index) => (
+                    <div
+                      key={index}
+                      className='p-2 hover:bg-gray-100 cursor-pointer'
+                      onClick={() => handleClubSelect(club.name)}
+                    >
+                      {club.name}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className='p-3 text-center text-gray-500'>
+                  No clubs available
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {showOthersField && (
+          <div className='mt-2'>
+            <input
+              type='text'
+              placeholder='Enter your club name'
+              value={otherClubName}
+              onChange={handleOtherClubChange}
+              className='w-full p-2 border border-gray-300 rounded-md'
+              disabled={!formik.values.categoryName}
+            />
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <div className='w-full'>
@@ -229,7 +345,9 @@ const openPrivacyModal = () => {
                       </div>
                       <div className='mt-1'>
                         Minimum Age:
-                        <span className='font-bold'>{category.minimumAge}</span>{" "}
+                        <span className='font-bold'>
+                          {category.minimumAge}
+                        </span>{" "}
                         - Age Upto:
                         <span className='font-bold'>{category.maximumAge}</span>
                       </div>
@@ -478,17 +596,7 @@ const openPrivacyModal = () => {
             <label className='block text-sm font-medium text-gray-700 mb-1'>
               Runner Club
             </label>
-            <input
-              type='text'
-              id='runnerClub'
-              name='runnerClub'
-              value={formik.values.runnerClub || ""}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={!formik.values.categoryName}
-              className='w-full p-2 border border-gray-300 rounded-md'
-              placeholder='None'
-            />
+            {renderRunnerClubField()}
           </div>
 
           <div>
@@ -531,8 +639,7 @@ const openPrivacyModal = () => {
                 type='button'
                 onClick={() => setShowPopup(true)}
                 className='text-blue-600 hover:text-blue-800'
-              >
-              </button>
+              ></button>
             </label>
             <input
               type='text'
@@ -551,7 +658,6 @@ const openPrivacyModal = () => {
               </p>
             )}
           </div>
-
 
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -790,18 +896,27 @@ const openPrivacyModal = () => {
 
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Coupon Code
+              Enter Coupon Code if Exist
             </label>
             <input
               type='text'
               id='couponCode'
               name='couponCode'
-              value={formik.values.couponCode || ""}
+              value={formik.values.couponCode || earlyBirdCoupon || ""}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              disabled={!formik.values.categoryName}
-              className='w-full p-2 border border-gray-300 rounded-md'
+              disabled={!formik.values.categoryName || !!earlyBirdCoupon}
+              className={`w-full p-2 border rounded-md ${
+              formik.touched.couponCode && formik.errors.couponCode
+                ? "border-red-500"
+                : "border-gray-300"
+              }`}
             />
+            {formik.touched.couponCode && formik.errors.couponCode && (
+              <p className='mt-1 text-sm text-red-500'>
+                {formik.errors.couponCode}
+              </p>
+            )}
           </div>
 
           <div className='col-span-1 md:col-span-2'>
@@ -822,34 +937,32 @@ const openPrivacyModal = () => {
                   }`}
                 />
               </div>
-<div className='ml-3 text-sm'>
-  <label htmlFor='termsAndConditions' className='text-gray-700'>
-    I agree to the
-    <span 
-      className='text-blue-600 cursor-pointer'
-      onClick={openTermsModal} 
-    >
-      Terms and Conditions
-    </span>
-  </label>
-  {formik.touched.termsAndConditions &&
-    formik.errors.termsAndConditions && (
-      <p className='mt-1 text-sm text-red-500'>
-        {formik.errors.termsAndConditions}
-      </p>
-    )}
-
-
+              <div className='ml-3 text-sm'>
+                <label htmlFor='termsAndConditions' className='text-gray-700'>
+                  I agree to the
+                  <span
+                    className='text-blue-600 cursor-pointer'
+                    onClick={openTermsModal}
+                  >
+                    Terms and Conditions
+                  </span>
+                </label>
+                {formik.touched.termsAndConditions &&
+                  formik.errors.termsAndConditions && (
+                    <p className='mt-1 text-sm text-red-500'>
+                      {formik.errors.termsAndConditions}
+                    </p>
+                  )}
               </div>
             </div>
           </div>
         </div>
       </div>
       <TermsAndConditionModal
-  isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  type={modalType}
-/>
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        type={modalType}
+      />
     </div>
   );
 };

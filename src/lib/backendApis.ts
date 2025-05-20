@@ -45,7 +45,6 @@ export const getEventBySlug = async (slug: string) => {
     });
 
     const data = response.data;
-    console.log("data", data);
     return { data };
   } catch (error) {
     console.error("Error fetching event by slug:", error);
@@ -53,21 +52,34 @@ export const getEventBySlug = async (slug: string) => {
   }
 };
 
-// export const getAllCoupons = async (eventId: string) => {
-//   if (!eventId) return [];
-//   try {
-//     const response = await fetch(`${baseUrl}/coupons/getcoupons?eventId=${eventId}`);
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     console.error("Error fetching coupons:", error);
-//     return [];
-//   }
-// };
+export const getRunnerClubs = async () => {
+  try {
+    const response = await axiosInstance.get(`/users/getAllRunnerClub`);
+    const data = response.data;
+    return { data };
+  } catch (error) {
+    console.error("Error fetching runner clubs:", error);
+    return [];
+  }
+};
+
+export const getEarlyBirdCoupon = async (eventId: string) => {
+  if (!eventId) return [];
+  try {
+    const response = await axiosInstance.get(
+      `/coupons/getearlybirdcoupon?eventId=${eventId}`
+    );
+    const data = await response.data;
+    return { data };
+  } catch (error) {
+    console.error("Error fetching coupons:", error);
+    return [];
+  }
+};
 
 export const registerUserForEvent = async (formData: FormData) => {
   try {
-    const response = await axios.post(`${baseUrl}/users/register`, formData, {
+    const response = await axiosInstance.post(`/users/register`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
