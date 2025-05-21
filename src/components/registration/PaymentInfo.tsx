@@ -219,7 +219,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   return (
     <div className='container mx-auto text-center mt-8'>
       <div className='flex justify-center'>
-        <div className='w-full md:w-2/3 lg:w-1/2 xl:w-1/3 px-4'>
+        <div className='w-full md:w-2/3 lg:w-1/2 px-4'>
           <h3 className='text-2xl font-semibold mb-6'>Order Preview</h3>
 
           <div className='overflow-x-auto shadow-lg rounded-lg'>
