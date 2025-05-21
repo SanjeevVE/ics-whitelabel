@@ -894,7 +894,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
               Enter Coupon Code if Exist
             </label>
@@ -917,7 +917,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
                 {formik.errors.couponCode}
               </p>
             )}
-          </div>
+          </div> */}
 
           <div className='col-span-1 md:col-span-2'>
             <div className='flex items-start mb-4'>

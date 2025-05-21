@@ -13,9 +13,9 @@ export default function EventsLayout({ children }: { children: ReactNode }) {
       <header className='bg-white shadow-sm sticky top-0 z-10'>
         <div className='container mx-auto px-4'>
           <div className='flex justify-between items-center py-4'>
-            <a href='/' className='font-bold text-2xl text-blue-600'>
+            {/* <a href='/' className='font-bold text-2xl text-blue-600'>
               NovaRace
-            </a>
+            </a> */}
 
             <button className='md:hidden text-gray-800'>
               <svg
