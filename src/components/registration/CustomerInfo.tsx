@@ -52,23 +52,16 @@ type CustomerInfoProps = {
 
 const CustomerInfo: React.FC<CustomerInfoProps> = ({
   eventCategory,
-  categoryMinimumAge,
   formik,
-  categoryNames,
-  customSlug,
   matchedAgeBracket,
   isMatched,
   isEmailVerificationEnabled = false,
   isSmsVerificationEnabled = false,
   findCoupon,
   earlyBirdCoupon,
-  club,
-  baseUrl = "",
+
 }) => {
-  const [showPopup, setShowPopup] = useState(false);
-  const [showPopupPhoto, setShowPopupPhoto] = useState(false);
-  const [hoveredCategory, setHoveredCategory] = useState<any>(null);
-  const [previewImages, setPreviewImages] = useState<string | null>(null);
+ const [hoveredCategory, setHoveredCategory] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"terms" | "privacy">("terms");
 
@@ -296,6 +289,8 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
       </>
     );
   };
+
+  const [showPopup, setShowPopup] = useState(false);
 
   return (
     <div className='w-full'>
