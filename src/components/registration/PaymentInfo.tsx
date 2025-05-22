@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { baseUrl } from "@/lib/apiConfig";
+import { FormValues } from "./StepperBooking";
 
 interface Category {
   id: string;
@@ -23,31 +24,31 @@ interface Coupon {
   discountPercentage?: number;
 }
 
-interface FormValues {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  mobileNumber: string;
-  address: string;
-  state: string;
-  country: string;
-  pincode: string;
-  categoryName: string;
-  key_id: string;
-  amount: number;
-  paymentOrderId: string;
-  eventName: string;
-  category: string;
-  thumbnail: string;
-  membershipId?: string;
-  couponCode?: string;
-  payableAmount: number;
-  applicationFee: number;
-  platformFee: number;
-  gst: number;
-  gstOnPlatformCharges?: number;
-}
+// interface FormValues {
+//   id?: string;
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   mobileNumber: string;
+//   address: string;
+//   state: string;
+//   country: string;
+//   pincode: string;
+//   categoryName: string;
+//   key_id: string;
+//   amount: number;
+//   paymentOrderId: string;
+//   eventName: string;
+//   category?: string;
+  // thumbnail?: string;
+  // membershipId?: string;
+  // couponCode?: string;
+  // payableAmount?: number;
+  // applicationFee?: number;
+  // platformFee?: number;
+  // gst?: number;
+  // gstOnPlatformCharges?: number;
+// }
 
 interface PaymentInfoProps {
   payAmount: number;
@@ -64,6 +65,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   const [toastMessage, setToastMessage] = useState("");
   const [toastVariant, setToastVariant] = useState("");
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const findCategory = event?.category?.find(
     (item) => item?.name === formValues?.categoryName
@@ -71,6 +73,31 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
   const currday = new Date();
   const orderId = currday.getTime().toString();
+
+  // Phone number formatting function
+  const formatPhoneNumber = (phone: string): string | null => {
+    if (!phone) return null;
+    
+    // Remove all non-digit characters
+    let cleanPhone = phone.replace(/\D/g, '');
+    
+    // If it's a 10-digit number, add country code (91 for India)
+    if (cleanPhone.length === 10) {
+      cleanPhone = '91' + cleanPhone;
+    }
+    
+    // Validate final format (should be 12 digits for India: 91xxxxxxxxxx)
+    if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      return cleanPhone;
+    }
+    
+    // Handle other country codes or lengths if needed
+    if (cleanPhone.length >= 10 && cleanPhone.length <= 15) {
+      return cleanPhone;
+    }
+    
+    return null;
+  };
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -96,28 +123,68 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     }
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, [orderId]);
 
   const sendNotifications = async () => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    
     try {
       const runnerId = formValues?.id;
+      
+      // Format phone number before sending
+      const formattedPhone = formatPhoneNumber(formValues?.mobileNumber);
+      
+      console.log("Original phone:", formValues?.mobileNumber);
+      console.log("Formatted phone:", formattedPhone);
+      
+      if (!formattedPhone) {
+        console.warn('Invalid phone number format:', formValues?.mobileNumber);
+        setToastVariant("warning");
+        setToastMessage("Phone number format may be invalid, but continuing with registration...");
+        setShowToast(true);
+      }
+
+      // Prepare the request payload
+      const requestData = {
+        phone: formattedPhone,
+        firstName: formValues?.firstName,
+        lastName: formValues?.lastName,
+        email: formValues?.email,
+        mobileNumber: formattedPhone, // Send formatted phone as backup
+        originalPhone: formValues?.mobileNumber, // Keep original for reference
+      };
 
       const response = await axios.post(
-        `${baseUrl}users/sendnotifications`,
-        null,
+        `${baseUrl}/users/sendnotifications`,
+        requestData,
         {
           params: {
             runnerId: runnerId,
             eventId: event?.id,
           },
+          timeout: 30000, // 30 second timeout
         }
       );
 
+      console.log("Notification API response:", response.data);
+
       if (response.status === 200) {
         const successUserId = formValues?.id;
-        window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
+        setToastVariant("success");
+        setToastMessage("Registration completed successfully! Redirecting...");
+        setShowToast(true);
+        
+        // Small delay before redirect to show success message
+        setTimeout(() => {
+          window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
+        }, 1500);
+        
         console.log("Notifications sent successfully:", response.data);
       } else {
         console.warn("Failed to send notifications:", response.data);
@@ -127,22 +194,44 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
       }
     } catch (error) {
       let errorMessage = "An error occurred. Please try again.";
+      
       if (typeof error === "object" && error !== null) {
         if ("response" in error && typeof (error as any).response === "object" && (error as any).response !== null) {
-          errorMessage = (error as any).response?.data?.error || errorMessage;
+          const errorResponse = (error as any).response;
+          errorMessage = errorResponse?.data?.error || 
+                        errorResponse?.data?.message || 
+                        `Server error: ${errorResponse?.status}` || 
+                        errorMessage;
+          
+          // Log detailed error for debugging
+          console.error("API Error Details:", {
+            status: errorResponse?.status,
+            data: errorResponse?.data,
+            headers: errorResponse?.headers
+          });
+          
+          // Handle specific WhatsApp API errors
+          if (errorResponse?.data?.error && errorResponse?.data?.error.includes('phone')) {
+            errorMessage = "Phone number format is invalid. Please check your phone number and try again.";
+          }
         } else if ("message" in error) {
           errorMessage = (error as any).message || errorMessage;
         }
       }
-      console.error("Error sending notifications:", errorMessage);
+      
+      console.error("Error sending notifications:", error);
       setToastVariant("danger");
       setToastMessage(errorMessage);
       setShowToast(true);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const launchPayment = (e: React.MouseEvent) => {
     e.preventDefault();
+
+    if (isProcessing) return;
 
     if (
       !scriptLoaded ||
@@ -158,13 +247,15 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
       return;
     }
 
+    setIsProcessing(true);
+
     try {
       const options = {
         key: formValues.key_id,
         amount: formValues.amount,
         currency: "INR",
         name: formValues.eventName,
-        description: formValues.category,
+        description: formValues.categoryName,
         image: formValues.thumbnail,
         order_id: formValues.paymentOrderId,
         prefill: {
@@ -180,19 +271,30 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         },
         handler: function (response: any) {
           console.log("Payment successful, response:", response);
+          setIsProcessing(false);
           setShowToast(true);
           setToastVariant("success");
-          setToastMessage("Payment successful...");
+          setToastMessage("Payment successful! Redirecting...");
 
-          const successUserId = formValues?.id;
-          window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
+          // Small delay before redirect
+          setTimeout(() => {
+            const successUserId = formValues?.id;
+            window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
+          }, 1500);
         },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+            console.log("Payment modal closed");
+          }
+        }
       };
 
       const razorpay = new (window as any).Razorpay(options);
 
       razorpay.on("payment.failed", function (response: any) {
         console.error("Payment failed:", response.error);
+        setIsProcessing(false);
         setToastVariant("danger");
         setToastMessage(`Payment failed: ${response.error.description}`);
         setShowToast(true);
@@ -201,6 +303,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
       razorpay.open();
     } catch (error) {
       console.error("Error opening Razorpay:", error);
+      setIsProcessing(false);
       setToastVariant("danger");
       setToastMessage("Failed to initialize payment. Please try again.");
       setShowToast(true);
@@ -220,6 +323,27 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
       ) / 100
     ).toFixed(2);
   };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    if (isProcessing) return;
+    
+    if (formValues.payableAmount === 0 || formValues.payableAmount === null) {
+      sendNotifications();
+    } else {
+      launchPayment(e);
+    }
+  };
+
+  // Auto-hide toast after 5 seconds
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   return (
     <div className='container mx-auto text-center mt-8'>
@@ -271,7 +395,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                   </>
                 )}
 
-                {formValues?.applicationFee > 0 && (
+                {(formValues?.applicationFee ?? 0) > 0 && (
                   <>
                     <tr className='bg-gray-50'>
                       <th className='p-3 text-left text-sm font-medium text-gray-700'>
@@ -286,7 +410,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                         GST On Platform Charges:
                       </th>
                       <td className='p-3 text-right font-semibold'>
-                        ₹ {((formValues?.applicationFee * 18) / 100).toFixed(2)}
+                        ₹ {(((formValues?.applicationFee ?? 0) * 18) / 100).toFixed(2)}
                       </td>
                     </tr>
                   </>
@@ -322,20 +446,27 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                 <tr>
                   <td colSpan={2} className='p-4 text-center'>
                     <button
-                      className='px-6 py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors'
-                      onClick={(e) => {
-                        if (formValues.payableAmount === 0) {
-                          sendNotifications();
-                        } else {
-                          launchPayment(e);
-                        }
-                      }}
-                      disabled={formValues.payableAmount > 0 && !scriptLoaded}
+                      className={`px-6 py-3 font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors ${
+                        isProcessing || ((formValues.payableAmount ?? 0) > 0 && !scriptLoaded)
+                          ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                          : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                      }`}
+                      onClick={handleButtonClick}
+                      disabled={isProcessing || (((formValues.payableAmount ?? 0) > 0) && !scriptLoaded)}
                     >
-                      {formValues.payableAmount === 0 ||
-                      formValues.payableAmount === null
-                        ? "Complete Registration"
-                        : "Proceed to Pay"}
+                      {isProcessing ? (
+                        <span className="flex items-center">
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Processing...
+                        </span>
+                      ) : (
+                        formValues.payableAmount === 0 || formValues.payableAmount === null
+                          ? "Complete Registration"
+                          : "Proceed to Pay"
+                      )}
                     </button>
                   </td>
                 </tr>
@@ -351,18 +482,23 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
           {showToast && (
             <div
-              className={`fixed top-4 right-4 p-4 rounded-md shadow-lg ${
+              className={`fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
                 toastVariant === "success"
                   ? "bg-green-100 text-green-800 border border-green-400"
+                  : toastVariant === "warning"
+                  ? "bg-yellow-100 text-yellow-800 border border-yellow-400"
                   : "bg-red-100 text-red-800 border border-red-400"
               }`}
               role='alert'
             >
               <div className='flex items-center justify-between'>
-                <strong className='text-sm font-medium'>Registration</strong>
+                <strong className='text-sm font-medium'>
+                  {toastVariant === "success" ? "Success" : 
+                   toastVariant === "warning" ? "Warning" : "Error"}
+                </strong>
                 <button
                   onClick={() => setShowToast(false)}
-                  className='text-gray-500 hover:text-gray-700 focus:outline-none'
+                  className='text-gray-500 hover:text-gray-700 focus:outline-none ml-4'
                   aria-label='Close'
                 >
                   <svg
