@@ -14,7 +14,7 @@ type EventCategoryType = {
     maximumAge?: number;
     gender?: string;
     displayAmount?: string;
-    amount?: string;
+    amount?: number;
   }>;
   [key: string]: any;
 };
@@ -23,6 +23,7 @@ type CustomerInfoProps = {
   eventCategory: EventCategoryType;
   categoryMinimumAge: number;
   formik: FormikProps<{
+    // Basic user information
     categoryName: string;
     firstName: string;
     lastName: string;
@@ -34,20 +35,55 @@ type CustomerInfoProps = {
     tShirtSize: string;
     nameOfTheBib?: string;
     bloodGroup?: string;
+    
+    // Address information
     address: string;
     city: string;
     pincode: string;
     state: string;
     country: string;
+    
+    // Emergency contact
     emergencyContactName: string;
     emergencyContactNumber: string;
     medicalConditions?: string;
+    
+    // Event-related fields (ADD THESE MISSING FIELDS)
+    eventId: string | null;
+    eventName: string;
+    eventType: string;
+    eventSlug: string;
+    registrationOpenDate: string | null;
+    registrationCloseDate: string | null;
+    eventDate: string | null;
+    location: string;
+    race: string;
+    distance: string;
+    eventTag: string;
+    eventStatus: string;
+    
+    // Additional fields
     couponCode?: string;
     hearAboutUs?: string;
     isPriorityLineUp?: boolean;
     jatreDistance?: string;
     timingSubmission?: string;
     garminLinks?: string;
+    company: string;
+    bibDistributionLocation: string;
+    educationInstitution: string;
+    age?: number;
+    platformFee?: number;
+    id?: string;
+    key_id?: string;
+    amount?: number;
+    paymentOrderId?: string;
+    orderId?: string;
+    paymentId?: string;
+    paymentStatus?: string;
+    paymentSignature?: string;
+    paymentMode?: string;
+    
     termsAndConditions: boolean;
   }>;
   categoryNames: string[];
@@ -56,13 +92,17 @@ type CustomerInfoProps = {
   isMatched: boolean;
   isEmailVerificationEnabled?: boolean;
   isSmsVerificationEnabled?: boolean;
-
   findCoupon?: (couponCode: string) => Promise<void>;
   earlyBirdCoupon: string;
   onRegisterClick?: () => void;
   club?: string;
   baseUrl?: string;
+  // Add these missing props that you're passing
+  coupon?: any;
+  earlyBird?: any;
+  couponError?: string | null;
 };
+
 
 const CustomerInfo: React.FC<CustomerInfoProps> = ({
   eventCategory,

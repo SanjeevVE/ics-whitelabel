@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Event {
   eventName: string;
@@ -17,6 +17,8 @@ interface Event {
 
 interface RightSidebarProps {
   event: Event;
+  latitude: string | null;
+  longitude: string | null;
   formatEventDate: (dateString: string) => string;
 }
 
@@ -26,35 +28,34 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
   const [longitude, setLongitude] = useState<string | null>(null);
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
 
-  // Handle scroll for sticky sidebar
   useEffect(() => {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 200);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch geocoding data when event location changes
   useEffect(() => {
     if (!event?.location) return;
-    
+
     setIsMapLoading(true);
-    
-    // Using Nominatim OpenStreetMap API for geocoding (free and no API key required)
-    const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(event.location)}`;
-    
+
+    const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+      event.location
+    )}`;
+
     fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data && data.length > 0) {
           setLatitude(data[0].lat);
           setLongitude(data[0].lon);
         }
         setIsMapLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching geocoding data:', error);
         setIsMapLoading(false);
       });
@@ -64,18 +65,18 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
 
   const buildRegistrationLink = () => {
     return `/events/${event.slug}/register${
-      event.layout ? `?layout=${event.layout}` : ""
+      event.layout ? `?layout=${event.layout}` : ''
     }`;
   };
 
   return (
     <div
       className={`w-full lg:w-1/3 px-4 ${
-        isSticky ? "lg:sticky lg:top-24 transition-all duration-300" : ""
+        isSticky ? 'lg:sticky lg:top-24 transition-all duration-300' : ''
       }`}
     >
-      {(event.status === "OPENFORREGISTRATION" ||
-        event.status === "UPCOMING") && (
+      {(event.status === 'OPENFORREGISTRATION' ||
+        event.status === 'UPCOMING') && (
         <Link
           href={buildRegistrationLink()}
           className="inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
@@ -90,7 +91,9 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
             <div className="text-gray-500">Loading map...</div>
           ) : latitude && longitude ? (
             <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&output=embed&ll=${latitude},${longitude}&z=8&iwloc`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                event.location
+              )}&output=embed&ll=${latitude},${longitude}&z=8&iwloc`}
               width="100%"
               height="100%"
               allowFullScreen
@@ -98,7 +101,9 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
               className="rounded-lg"
             ></iframe>
           ) : (
-            <div className="text-gray-500">Could not load map for this location</div>
+            <div className="text-gray-500">
+              Could not load map for this location
+            </div>
           )}
         </div>
 
@@ -143,7 +148,7 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span>{formatEventDate(event.date || "")}</span>
+              <span>{formatEventDate(event.date || '')}</span>
             </div>
           )}
         </div>
