@@ -125,13 +125,18 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         setToastMessage("Failed to complete registration. Please try again.");
         setShowToast(true);
       }
-    } catch (error: unknown) {
-      console.error(
-        "Error sending notifications:",
-        error.response?.data?.error || error.message
-      );
+    } catch (error) {
+      let errorMessage = "An error occurred. Please try again.";
+      if (typeof error === "object" && error !== null) {
+        if ("response" in error && typeof (error as any).response === "object" && (error as any).response !== null) {
+          errorMessage = (error as any).response?.data?.error || errorMessage;
+        } else if ("message" in error) {
+          errorMessage = (error as any).message || errorMessage;
+        }
+      }
+      console.error("Error sending notifications:", errorMessage);
       setToastVariant("danger");
-      setToastMessage("An error occurred. Please try again.");
+      setToastMessage(errorMessage);
       setShowToast(true);
     }
   };

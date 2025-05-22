@@ -44,6 +44,7 @@ interface Event {
   slug: string;
   eventPicture: string;
   category?: CategoryDetail[];
+  latitude: string;
   location: string;
   date?: string;
   description?: string;
