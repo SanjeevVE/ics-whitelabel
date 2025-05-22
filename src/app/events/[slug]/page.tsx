@@ -242,28 +242,6 @@ export default function EventPage() {
     );
   }
 
-  // function BreadcrumbNavigation({
-  //   event,
-  //   breadcrumbName,
-  //   name,
-  // }: {
-  //   event: Event | null;
-  //   breadcrumbName: string;
-  //   name?: string;
-  // }) {
-  //   return (
-  //     <section className="py-3 px-3 flex items-center bg-white">
-  //       <div className="flex items-center justify-between w-full">
-  //         <div className="flex gap-2 items-center text-sm">
-  //           <div>{event?.eventName}</div>
-  //           <div>&gt;</div>
-  //           <div>{name || breadcrumbName}</div>
-  //         </div>
-  //       </div>
-  //     </section>
-  //   );
-  // }
-
   if (loading) {
     return (
       <div className="container pt-40">
@@ -299,7 +277,10 @@ export default function EventPage() {
           role="alert"
         >
           <h4 className="font-bold">Event Not Found</h4>
-          <p>Sorry, we couldn&apos;t find the event youBreadcrumbNavigation re looking for.</p>
+          <p>
+            Sorry, we couldn&apos;t find the event youBreadcrumbNavigation re
+            looking for.
+          </p>
         </div>
       </div>
     );
