@@ -18,48 +18,22 @@ interface Event {
   emailBanner?: string;
 }
 
-interface Coupon {
-  couponCode: string;
-  discountAmount?: number;
-  discountPercentage?: number;
-}
-
-// interface FormValues {
-//   id?: string;
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   mobileNumber: string;
-//   address: string;
-//   state: string;
-//   country: string;
-//   pincode: string;
-//   categoryName: string;
-//   key_id: string;
-//   amount: number;
-//   paymentOrderId: string;
-//   eventName: string;
-//   category?: string;
-  // thumbnail?: string;
-  // membershipId?: string;
-  // couponCode?: string;
-  // payableAmount?: number;
-  // applicationFee?: number;
-  // platformFee?: number;
-  // gst?: number;
-  // gstOnPlatformCharges?: number;
-// }
-
 interface PaymentInfoProps {
   payAmount: number;
   formValues: FormValues;
   event: Event;
+  coupons?: Array<{
+    couponCode: string;
+    discountAmount?: number;
+    discountPercentage?: number;
+  }>;
 }
 
 const PaymentInfo: React.FC<PaymentInfoProps> = ({
   payAmount,
   formValues,
   event,
+  coupons = [],
 }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -74,32 +48,8 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   const currday = new Date();
   const orderId = currday.getTime().toString();
 
-  // Phone number formatting function
-  const formatPhoneNumber = (phone: string): string | null => {
-    if (!phone) return null;
-    
-    // Remove all non-digit characters
-    let cleanPhone = phone.replace(/\D/g, '');
-    
-    // If it's a 10-digit number, add country code (91 for India)
-    if (cleanPhone.length === 10) {
-      cleanPhone = '91' + cleanPhone;
-    }
-    
-    // Validate final format (should be 12 digits for India: 91xxxxxxxxxx)
-    if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
-      return cleanPhone;
-    }
-    
-    // Handle other country codes or lengths if needed
-    if (cleanPhone.length >= 10 && cleanPhone.length <= 15) {
-      return cleanPhone;
-    }
-    
-    return null;
-  };
-
   useEffect(() => {
+    // Load Razorpay script
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
@@ -118,6 +68,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
     document.body.appendChild(script);
 
+    // Store order ID in localStorage
     if (typeof window !== "undefined") {
       window.localStorage.setItem("orderId", orderId);
     }
@@ -135,56 +86,19 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     setIsProcessing(true);
     
     try {
-      const runnerId = formValues?.id;
-      
-      // Format phone number before sending
-      const formattedPhone = formatPhoneNumber(formValues?.mobileNumber);
-      
-      console.log("Original phone:", formValues?.mobileNumber);
-      console.log("Formatted phone:", formattedPhone);
-      
-      if (!formattedPhone) {
-        console.warn('Invalid phone number format:', formValues?.mobileNumber);
-        setToastVariant("warning");
-        setToastMessage("Phone number format may be invalid, but continuing with registration...");
-        setShowToast(true);
-      }
-
-      // Prepare the request payload
-      const requestData = {
-        phone: formattedPhone,
-        firstName: formValues?.firstName,
-        lastName: formValues?.lastName,
-        email: formValues?.email,
-        mobileNumber: formattedPhone, // Send formatted phone as backup
-        originalPhone: formValues?.mobileNumber, // Keep original for reference
-      };
-
       const response = await axios.post(
         `${baseUrl}/users/sendnotifications`,
-        requestData,
+        null,
         {
           params: {
-            runnerId: runnerId,
+            runnerId: formValues?.id,
             eventId: event?.id,
           },
-          timeout: 30000, // 30 second timeout
         }
       );
 
-      console.log("Notification API response:", response.data);
-
       if (response.status === 200) {
-        const successUserId = formValues?.id;
-        setToastVariant("success");
-        setToastMessage("Registration completed successfully! Redirecting...");
-        setShowToast(true);
-        
-        // Small delay before redirect to show success message
-        setTimeout(() => {
-          window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
-        }, 1500);
-        
+        window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${formValues?.id}`;
         console.log("Notifications sent successfully:", response.data);
       } else {
         console.warn("Failed to send notifications:", response.data);
@@ -192,36 +106,13 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         setToastMessage("Failed to complete registration. Please try again.");
         setShowToast(true);
       }
-    } catch (error) {
-      let errorMessage = "An error occurred. Please try again.";
-      
-      if (typeof error === "object" && error !== null) {
-        if ("response" in error && typeof (error as any).response === "object" && (error as any).response !== null) {
-          const errorResponse = (error as any).response;
-          errorMessage = errorResponse?.data?.error || 
-                        errorResponse?.data?.message || 
-                        `Server error: ${errorResponse?.status}` || 
-                        errorMessage;
-          
-          // Log detailed error for debugging
-          console.error("API Error Details:", {
-            status: errorResponse?.status,
-            data: errorResponse?.data,
-            headers: errorResponse?.headers
-          });
-          
-          // Handle specific WhatsApp API errors
-          if (errorResponse?.data?.error && errorResponse?.data?.error.includes('phone')) {
-            errorMessage = "Phone number format is invalid. Please check your phone number and try again.";
-          }
-        } else if ("message" in error) {
-          errorMessage = (error as any).message || errorMessage;
-        }
-      }
-      
-      console.error("Error sending notifications:", error);
+    } catch (error: any) {
+      console.error(
+        "Error sending notifications:",
+        error.response?.data?.error || error.message
+      );
       setToastVariant("danger");
-      setToastMessage(errorMessage);
+      setToastMessage("An error occurred. Please try again.");
       setShowToast(true);
     } finally {
       setIsProcessing(false);
@@ -274,13 +165,9 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
           setIsProcessing(false);
           setShowToast(true);
           setToastVariant("success");
-          setToastMessage("Payment successful! Redirecting...");
+          setToastMessage("Payment successful...");
 
-          // Small delay before redirect
-          setTimeout(() => {
-            const successUserId = formValues?.id;
-            window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
-          }, 1500);
+          window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${formValues?.id}`;
         },
         modal: {
           ondismiss: function() {
@@ -334,134 +221,104 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     }
   };
 
-  // Auto-hide toast after 5 seconds
-  useEffect(() => {
-    if (showToast) {
-      const timer = setTimeout(() => {
-        setShowToast(false);
-      }, 5000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [showToast]);
-
   return (
-    <div className='container mx-auto text-center mt-8'>
-      <div className='flex justify-center'>
-        <div className='w-full md:w-2/3 lg:w-1/2 px-4'>
-          <h3 className='text-2xl font-semibold mb-6'>Order Preview</h3>
-
-          <div className='overflow-x-auto shadow-lg rounded-lg'>
-            <table className='min-w-full table-auto border-collapse'>
-              <tbody className='divide-y divide-gray-200'>
-                <tr className='bg-gray-50'>
-                  <th className='p-3 text-left text-sm font-medium text-gray-700 whitespace-nowrap'>
-                    Ticket Price
-                  </th>
-                  <td className='p-3 text-right font-semibold text-gray-900'>
-                    ₹ {findCategory?.amount}
+    <>
+      <style jsx>{`
+        .table {
+          white-space: nowrap;
+        }
+      `}</style>
+      
+      <div className='container text-center mt-5'>
+        <div className="row justify-content-center">
+          <h3>Order Preview</h3>
+          <div className="col-sm-12 col-md-6 col-lg-5 col-xl-4 table-responsive mt-3 shadow-lg">
+            <table className="table table-striped text-left mb-0">
+              <tbody>
+                <tr>
+                  <th className='p-1'>Ticket Price:</th>
+                  <td className='p-1 text-right'>
+                    <b>₹ {findCategory?.amount}</b>
                   </td>
                 </tr>
 
                 {formValues?.membershipId && (
-                  <tr className='bg-white'>
-                    <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                      Membership Id:
-                    </th>
-                    <td className='p-3 text-right font-semibold'>
-                      {formValues?.membershipId}
+                  <tr>
+                    <th className='p-1'>Membership Id:</th>
+                    <td className='p-1 text-right'>
+                      <b>{formValues?.membershipId}</b>
                     </td>
                   </tr>
                 )}
 
                 {formValues?.couponCode && (
                   <>
-                    <tr className='bg-gray-50'>
-                      <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                        Coupon Code Applied:
-                      </th>
-                      <td className='p-3 text-right font-semibold'>
-                        {formValues?.couponCode}
+                    <tr>
+                      <th className='p-1'>Coupon Code Applied:</th>
+                      <td className='p-1 text-right'>
+                        <b>{formValues?.couponCode}</b>
                       </td>
                     </tr>
-                    <tr className='bg-white'>
-                      <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                        Discount:
-                      </th>
-                      <td className='p-3 text-right font-semibold'>
-                        ₹ {calculateDiscount()}
+                    <tr>
+                      <th className='p-1'>Discount:</th>
+                      <td className='p-1 text-right'>
+                        <b>₹ {calculateDiscount()}</b>
                       </td>
                     </tr>
                   </>
                 )}
 
-                {(formValues?.applicationFee ?? 0) > 0 && (
+                {(formValues?.applicationFee !== undefined && formValues.applicationFee > 0) && (
                   <>
-                    <tr className='bg-gray-50'>
-                      <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                        Platform Charges:
-                      </th>
-                      <td className='p-3 text-right font-semibold'>
-                        ₹ {formValues?.applicationFee}
+                    <tr>
+                      <th className='p-1'>Platform Charges:</th>
+                      <td className='p-1 text-right'>
+                        <b>₹ {formValues?.applicationFee}</b>
                       </td>
                     </tr>
-                    <tr className='bg-white'>
-                      <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                        GST On Platform Charges:
-                      </th>
-                      <td className='p-3 text-right font-semibold'>
-                        ₹ {(((formValues?.applicationFee ?? 0) * 18) / 100).toFixed(2)}
+                    <tr>
+                      <th className='p-1'>GST On Platform Charges:</th>
+                      <td className='p-1 text-right'>
+                        <b>₹ {(formValues.applicationFee * 18 / 100).toFixed(2)}</b>
                       </td>
                     </tr>
                   </>
                 )}
 
-                <tr className='bg-gray-50'>
-                  <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                    Payment Gateway Charges (2%):
-                  </th>
-                  <td className='p-3 text-right font-semibold'>
-                    ₹ {formValues?.platformFee}
+                <tr>
+                  <th className='p-1'>Payment Gateway Charges (2%):</th>
+                  <td className='p-1 text-right'>
+                    <b>₹ {formValues?.platformFee}</b>
                   </td>
                 </tr>
 
-                <tr className='bg-white'>
-                  <th className='p-3 text-left text-sm font-medium text-gray-700'>
-                    GST On Payment Gateway Charges:
-                  </th>
-                  <td className='p-3 text-right font-semibold'>
-                    ₹ {formValues?.gst}
+                <tr>
+                  <th className='p-1'>GST On Payment Gateway Charges:</th>
+                  <td className='p-1 text-right'>
+                    <b>₹ {formValues?.gst}</b>
                   </td>
                 </tr>
 
-                <tr className='bg-gray-100 border-t-2 border-gray-400'>
-                  <th className='p-3 text-left text-sm font-bold text-gray-800'>
-                    Estimated Total Payable*:
-                  </th>
-                  <td className='p-3 text-right font-bold text-green-600'>
+                <tr style={{ borderTop: "1px solid #000" }}>
+                  <th className='p-1 fw-bold'>Estimated Total Payable*:</th>
+                  <td className='p-1 text-right fw-bold text-success'>
                     ₹ {formValues?.payableAmount}
                   </td>
                 </tr>
 
                 <tr>
-                  <td colSpan={2} className='p-4 text-center'>
-                    <button
-                      className={`px-6 py-3 font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors ${
+                  <td colSpan={2} style={{ textAlign: "center" }}>
+                    <button 
+                      className={`btn btn-lg ${
                         isProcessing || ((formValues.payableAmount ?? 0) > 0 && !scriptLoaded)
-                          ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                          : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                          ? 'btn-secondary'
+                          : 'btn-success'
                       }`}
                       onClick={handleButtonClick}
                       disabled={isProcessing || (((formValues.payableAmount ?? 0) > 0) && !scriptLoaded)}
                     >
                       {isProcessing ? (
-                        <span className="flex items-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Processing...
-                        </span>
+                        "Processing..."
                       ) : (
                         formValues.payableAmount === 0 || formValues.payableAmount === null
                           ? "Complete Registration"
@@ -473,55 +330,41 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
               </tbody>
             </table>
 
-            <div className='p-3 text-xs text-red-600'>
-              * Please note: This is a preliminary total. Your payment gateway
-              may calculate processing fees slightly differently at checkout.
-              The exact amount will be displayed before you confirm payment.
+            <div className='mb-2'>
+              <span className='text-danger' style={{ fontSize: '14px' }}>
+                * Please note: This is a preliminary total. Your payment gateway may calculate processing fees slightly differently at checkout. The exact amount will be displayed before you confirm payment.
+              </span>
             </div>
           </div>
-
-          {showToast && (
-            <div
-              className={`fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-                toastVariant === "success"
-                  ? "bg-green-100 text-green-800 border border-green-400"
-                  : toastVariant === "warning"
-                  ? "bg-yellow-100 text-yellow-800 border border-yellow-400"
-                  : "bg-red-100 text-red-800 border border-red-400"
-              }`}
-              role='alert'
-            >
-              <div className='flex items-center justify-between'>
-                <strong className='text-sm font-medium'>
-                  {toastVariant === "success" ? "Success" : 
-                   toastVariant === "warning" ? "Warning" : "Error"}
-                </strong>
-                <button
-                  onClick={() => setShowToast(false)}
-                  className='text-gray-500 hover:text-gray-700 focus:outline-none ml-4'
-                  aria-label='Close'
-                >
-                  <svg
-                    className='h-4 w-4'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M6 18L18 6M6 6l12 12'
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div className='mt-2 text-sm'>{toastMessage}</div>
-            </div>
-          )}
         </div>
+
+        {/* Toast Notification */}
+        {showToast && (
+          <div
+            className={`position-fixed top-0 end-0 p-3`}
+            style={{ zIndex: 1050 }}
+          >
+            <div
+              className={`toast show bg-${toastVariant === 'success' ? 'success' : 'danger'} text-white`}
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
+              <div className="toast-header">
+                <strong className="me-auto">Registration</strong>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowToast(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="toast-body">{toastMessage}</div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 
