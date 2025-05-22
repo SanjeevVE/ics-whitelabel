@@ -116,6 +116,8 @@ export interface FormValues {
   applicationFee?: number;
   gst?: number;
   gstOnPlatformCharges?: number;
+  whatsAppNumber: string;
+  enableWhatsApp: boolean;
 }
 
 const useEvent = (eventSlug: string) => {
@@ -369,9 +371,10 @@ const StepperBooking: React.FC = () => {
     eventTag: event?.tag || '',
     eventStatus: event?.status || '',
     platformFee: 0,
+    whatsAppNumber: '',
+    enableWhatsApp: false,
   });
 
-  // Create a consistent type for formik values
   type FormikValues = FormValues;
 
   const validationSchema = Yup.object({
@@ -489,7 +492,6 @@ const StepperBooking: React.FC = () => {
             const updatedValues: FormValues = {
               ...values,
               ...responseData,
-              // Ensure all required string fields have default values
               couponCode: responseData.couponCode || values.couponCode || '',
               runnerClub:
                 responseData.runnerClub || values.runnerClub || 'None',
