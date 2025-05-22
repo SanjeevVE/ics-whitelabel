@@ -63,7 +63,7 @@ const TermsAndConditionModal: React.FC<TermsAndPolicyModalProps> = ({
 
               <h3 className="text-lg font-semibold">4. Registration and Payment</h3>
               <p>
-                Registration is only confirmed upon successful payment. Refunds, if applicable, follow the organizer's policy. Payments are processed securely through third-party gateways.
+                Registration is only confirmed upon successful payment. Refunds, if applicable, follow the organizer&rsquo;s policy. Payments are processed securely through third-party gateways.
               </p>
 
               <h3 className="text-lg font-semibold">5. Organizer Responsibility</h3>
