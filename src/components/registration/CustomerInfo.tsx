@@ -642,7 +642,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
                     </p>
                   )}
                 <p className="mt-1 text-xs text-gray-500">
-                  We'll send event updates and notifications to this WhatsApp
+                  We&#39;ll send event updates and notifications to this WhatsApp
                   number
                 </p>
               </div>
