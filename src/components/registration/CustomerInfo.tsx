@@ -5,8 +5,22 @@ import { FormikProps } from "formik";
 import TermsAndConditionModal from "./TermsAndConditionModal";
 import { getRunnerClubs } from "../../lib/backendApis";
 
+type EventCategoryType = {
+  category: Array<{
+    name: string;
+    distance: string;
+    description?: string;
+    minimumAge?: number;
+    maximumAge?: number;
+    gender?: string;
+    displayAmount?: string;
+    amount?: string;
+  }>;
+  [key: string]: any;
+};
+
 type CustomerInfoProps = {
-  eventCategory: any;
+  eventCategory: EventCategoryType;
   categoryMinimumAge: number;
   formik: FormikProps<{
     categoryName: string;
@@ -118,11 +132,6 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     setIsModalOpen(true);
   };
 
-  const openPrivacyModal = () => {
-    setModalType("privacy");
-    setIsModalOpen(true);
-  };
-
   const calculateAge = useMemo(() => {
     return (dateOfBirth: string) => {
       const birthDate = new Date(dateOfBirth);
@@ -146,9 +155,9 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   );
 
   const handleDateChange = useCallback(
-    (date: any) => {
+    (date: unknown) => {
       formik.setFieldTouched("dateOfBirth", true);
-      const adjustedDate = new Date(date);
+      const adjustedDate = new Date(date as string);
       adjustedDate.setMinutes(
         adjustedDate.getMinutes() - adjustedDate.getTimezoneOffset()
       );
@@ -161,7 +170,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
       );
       formik.setFieldValue("dateOfBirth", utcDate.toISOString().split("T")[0]);
 
-      const newAge = calculateAge(date);
+      const newAge = calculateAge(date as string);
       setAge(newAge);
     },
     [formik, calculateAge]

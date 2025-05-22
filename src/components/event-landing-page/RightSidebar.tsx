@@ -4,6 +4,7 @@ import Link from "next/link";
 interface Event {
   eventName: string;
   slug: string;
+  latitude: string;
   location: string;
   date?: string;
   status?: string;

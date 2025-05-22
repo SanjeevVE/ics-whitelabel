@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -84,7 +84,6 @@ export default function EventPage() {
   const [longitude, setLongitude] = useState<string | null>(null);
 
   const params = useParams();
-  const searchParams = useSearchParams();
   const slug = params?.slug as string;
 
   function isRegistrationOpen(eventData: Event) {

@@ -125,7 +125,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         setToastMessage("Failed to complete registration. Please try again.");
         setShowToast(true);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(
         "Error sending notifications:",
         error.response?.data?.error || error.message
