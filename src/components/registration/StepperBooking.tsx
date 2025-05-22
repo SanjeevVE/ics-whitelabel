@@ -48,7 +48,7 @@ interface AgeBracket {
 
 interface Coupon {
   id: string;
-  couponCode: string;
+  couponCode?: string;
   couponType: string;
   discount: number;
   eventId: string;
@@ -81,16 +81,16 @@ export interface FormValues {
   emergencyContactName: string;
   emergencyContactNumber: string;
   categoryName: string;
-  couponCode: string;
-  runnerClub: string;
+  couponCode?: string;
+  runnerClub?: string;
   company: string;
   bibDistributionLocation: string;
-  nameOfTheBib: string;
-  bloodGroup: string;
+  nameOfTheBib?: string;
+  bloodGroup?: string;
   educationInstitution: string;
-  medicalConditions: string;
+  medicalConditions?: string;
   termsAndConditions: boolean;
-  hearAboutUs: string;
+  hearAboutUs?: string;
   race: string;
   distance: string;
   eventTag: string;
@@ -110,6 +110,12 @@ export interface FormValues {
   jatreDistance?: string;
   timingSubmission?: string;
   garminLinks?: string;
+  thumbnail?: string;
+  membershipId?: string;
+  payableAmount?: number;
+  applicationFee?: number;
+  gst?: number;
+  gstOnPlatformCharges?: number;
 }
 
 const useEvent = (eventSlug: string) => {
@@ -365,45 +371,50 @@ const StepperBooking: React.FC = () => {
     platformFee: 0,
   });
 
-  const formik = useFormik({
+  // Create a consistent type for formik values
+  type FormikValues = FormValues;
+
+  const validationSchema = Yup.object({
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    mobileNumber: Yup.string()
+      .required('Mobile Number is required')
+      .matches(/^(?!0|(\+91))\d{10}$/, {
+        message: 'Mobile Number should be 10 digits without 0 or +91 prefix',
+      }),
+    gender: Yup.string().required('Gender is required'),
+    dateOfBirth: Yup.date()
+      .max(new Date(), 'Date of Birth must be in the past')
+      .required('Date of Birth is required'),
+    tShirtSize: Yup.string().required('T-Shirt Size is required'),
+    address: Yup.string().required('Address is required'),
+    city: Yup.string().required('City is required'),
+    pincode: Yup.string().required('Pincode is required'),
+    state: Yup.string().required('State is required'),
+    country: Yup.string().required('Country is required'),
+    emergencyContactName: Yup.string().required(
+      'Emergency Contact Name is required'
+    ),
+    emergencyContactNumber: Yup.string()
+      .required('Emergency Contact Number is required')
+      .test(
+        'not-same-as-mobile',
+        'Contact number and emergency contact number cannot be the same.',
+        function (value) {
+          return value !== this.parent.mobileNumber;
+        }
+      ),
+    categoryName: Yup.string().required('Category Name is required'),
+    termsAndConditions: Yup.boolean()
+      .oneOf([true], 'You must agree to the terms')
+      .required('Terms acceptance is required'),
+  });
+
+  const formik = useFormik<FormikValues>({
     enableReinitialize: true,
     initialValues: getInitialFormValues(event, earlyBirdCoupon),
-    validationSchema: Yup.object({
-      firstName: Yup.string().required('First Name is required'),
-      lastName: Yup.string().required('Last Name is required'),
-      email: Yup.string().email('Invalid email').required('Email is required'),
-      mobileNumber: Yup.string()
-        .required('Mobile Number is required')
-        .matches(/^(?!0|(\+91))\d{10}$/, {
-          message: 'Mobile Number should be 10 digits without 0 or +91 prefix',
-        }),
-      gender: Yup.string().required('Gender is required'),
-      dateOfBirth: Yup.date()
-        .max(new Date(), 'Date of Birth must be in the past')
-        .required('Date of Birth is required'),
-      tShirtSize: Yup.string().required('T-Shirt Size is required'),
-      address: Yup.string().required('Address is required'),
-      city: Yup.string().required('City is required'),
-      pincode: Yup.string().required('Pincode is required'),
-      state: Yup.string().required('State is required'),
-      country: Yup.string().required('Country is required'),
-      emergencyContactName: Yup.string().required(
-        'Emergency Contact Name is required'
-      ),
-      emergencyContactNumber: Yup.string()
-        .required('Emergency Contact Number is required')
-        .test(
-          'not-same-as-mobile',
-          'Contact number and emergency contact number cannot be the same.',
-          function (value) {
-            return value !== this.parent.mobileNumber;
-          }
-        ),
-      categoryName: Yup.string().required('Category Name is required'),
-      termsAndConditions: Yup.boolean()
-        .oneOf([true], 'You must agree to the terms')
-        .required('Terms acceptance is required'),
-    }),
+    validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
         setLoading(true);
@@ -480,13 +491,26 @@ const StepperBooking: React.FC = () => {
               ...responseData,
               // Ensure all required string fields have default values
               couponCode: responseData.couponCode || values.couponCode || '',
-              runnerClub: responseData.runnerClub || values.runnerClub || 'None',
+              runnerClub:
+                responseData.runnerClub || values.runnerClub || 'None',
               company: responseData.company || values.company || 'None',
-              nameOfTheBib: responseData.nameOfTheBib || values.nameOfTheBib || `${values.firstName} ${values.lastName}`,
-              bibDistributionLocation: responseData.bibDistributionLocation || values.bibDistributionLocation || '',
+              nameOfTheBib:
+                responseData.nameOfTheBib ||
+                values.nameOfTheBib ||
+                `${values.firstName} ${values.lastName}`,
+              bibDistributionLocation:
+                responseData.bibDistributionLocation ||
+                values.bibDistributionLocation ||
+                '',
               bloodGroup: responseData.bloodGroup || values.bloodGroup || '',
-              educationInstitution: responseData.educationInstitution || values.educationInstitution || '',
-              medicalConditions: responseData.medicalConditions || values.medicalConditions || '',
+              educationInstitution:
+                responseData.educationInstitution ||
+                values.educationInstitution ||
+                '',
+              medicalConditions:
+                responseData.medicalConditions ||
+                values.medicalConditions ||
+                '',
               hearAboutUs: responseData.hearAboutUs || values.hearAboutUs || '',
               platformFee: responseData.platformFee || 0,
               eventId: event?.id || null,
@@ -677,7 +701,6 @@ const StepperBooking: React.FC = () => {
             formValues={formValues}
             payAmount={event.category?.[0]?.amount}
             event={event}
-            coupons={earlyBirdCoupon}
           />
         ) : null;
 

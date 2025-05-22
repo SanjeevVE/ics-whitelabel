@@ -93,7 +93,7 @@ type CustomerInfoProps = {
   isEmailVerificationEnabled?: boolean;
   isSmsVerificationEnabled?: boolean;
   findCoupon?: (couponCode: string) => Promise<void>;
-  earlyBirdCoupon: string;
+  earlyBirdCoupon?: string;
   onRegisterClick?: () => void;
   club?: string;
   baseUrl?: string;
@@ -112,7 +112,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   isEmailVerificationEnabled = false,
   isSmsVerificationEnabled = false,
   findCoupon,
-  earlyBirdCoupon,
+
 
 }) => {
  const [hoveredCategory, setHoveredCategory] = useState<any>(null);
