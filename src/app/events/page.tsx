@@ -20,8 +20,12 @@ export default function EventsPage() {
       });
 
       setEvents(response.data || []);
-    } catch (error: any) {
-      setError(error.message || "Failed to fetch events");
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "message" in error) {
+        setError((error as { message: string }).message || "Failed to fetch events");
+      } else {
+        setError("Failed to fetch events");
+      }
       console.error(error);
     } finally {
       setLoading(false);
