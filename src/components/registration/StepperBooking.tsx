@@ -413,7 +413,7 @@ const StepperBooking: React.FC = () => {
             value !== null &&
             value !== undefined &&
             ![
-              "eventId",
+               "eventId",
               "eventName",
               "eventType",
               "eventSlug",
