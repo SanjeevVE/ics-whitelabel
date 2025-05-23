@@ -1,16 +1,24 @@
 import "./globals.css";
 import { ReactNode } from "react";
+import { generateMetadata } from "@/utils/metadata";
 
-export const metadata = {
-  title: "NovaRace",
-  description: "Find and register for marathon events across India.",
-};
+interface RootLayoutProps {
+  children: ReactNode;
+}
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export const metadata = generateMetadata({
+  title: "Event Management Platform",
+  description: "Join the community of runners, cyclists, and fitness enthusiasts across India. Discover and register for exciting upcoming events!",
+  keywords: "running, cycling, marathon, events, fitness, sports, India, registration",
+  ogImage: "/images/og-default.jpg",
+  ogType: "website"
+});
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang='en'>
-      <body className='bg-gray-50 text-gray-800'>
-        <main>{children}</main>
+    <html lang="en">
+      <body>
+        {children}
       </body>
     </html>
   );

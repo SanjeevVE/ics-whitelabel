@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <section className='py-12 px-4'>
       <div className='container mx-auto text-center'>
-        <h1 className='text-4xl font-bold mb-6'>Welcome to NovaRace</h1>
+        <h1 className='text-4xl font-bold mb-6'>Welcome to Event Registration</h1>
         <p className='text-gray-600 mb-8 max-w-2xl mx-auto'>
           Join the community of runners, cyclists, and fitness enthusiasts
           across India. Discover and register for exciting upcoming events!

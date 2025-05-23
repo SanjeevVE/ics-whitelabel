@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
-import Head from 'next/head';
 import RightSidebar from '@/components/event-landing-page/RightSidebar';
 
 import Tshirt from '../../../../public/img/event-landing-page/tshirt.png';
@@ -278,8 +277,7 @@ export default function EventPage() {
         >
           <h4 className="font-bold">Event Not Found</h4>
           <p>
-            Sorry, we couldn&apos;t find the event youBreadcrumbNavigation re
-            looking for.
+            Sorry, we couldn&apos;t find the event you&apos;re looking for.
           </p>
         </div>
       </div>
@@ -398,14 +396,6 @@ export default function EventPage() {
 
   return (
     <>
-      <Head>
-        <title>Novarace: {event.eventName}</title>
-        <meta
-          property="og:url"
-          content={`https://www.novarace.in/pages/share/${event.slug}`}
-        />
-      </Head>
-
       {renderClosedEventNotification()}
 
       <section className="p-8">
