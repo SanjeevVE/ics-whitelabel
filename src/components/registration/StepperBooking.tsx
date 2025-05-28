@@ -762,7 +762,7 @@ const StepperBooking: React.FC = () => {
         </div>
       </div>
 
-      <div className="mb-10 bg-white p-6 rounded-lg shadow-md">
+      <div className="mb-10 bg-white rounded-lg shadow-md">
         {renderStepContent()}
       </div>
 
