@@ -192,8 +192,8 @@ const useEarlyBirdCoupon = (eventId: string | undefined) => {
 };
 
 const BlockingLoader: React.FC = () => (
-  <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+  <div className='fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50'>
+    <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600'></div>
   </div>
 );
 
@@ -715,19 +715,19 @@ const StepperBooking: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center p-8 max-w-md">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-gray-700">{error}</p>
+      <div className='flex items-center justify-center h-screen'>
+        <div className='text-center p-8 max-w-md'>
+          <h2 className='text-xl font-bold text-red-600 mb-4'>Error</h2>
+          <p className='text-gray-700'>{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-6">
-      <div className="w-full mb-8 flex justify-center">
-        <div className="flex items-center w-full max-w-3xl">
+    <div className='w-full max-w-5xl mx-auto'>
+      <div className='w-full mb-8 flex justify-center'>
+        <div className='flex items-center w-full max-w-3xl'>
           {steps.map((step, index) => (
             <React.Fragment key={index}>
               <div
@@ -746,13 +746,13 @@ const StepperBooking: React.FC = () => {
                 >
                   {index < currentStep ? '✓' : step.stepNo}
                 </div>
-                <div className="text-xs mt-1">{step.title}</div>
+                <div className='text-xs mt-1 text-center'>{step.title}</div>
               </div>
 
               {index < steps.length - 1 && (
-                <div className="flex-1 h-0.5 mx-2 bg-gray-300">
+                <div className='flex-1 h-0.5 mx-2 bg-gray-300'>
                   <div
-                    className="h-full bg-blue-600"
+                    className='h-full bg-blue-600'
                     style={{ width: index < currentStep ? '100%' : '0%' }}
                   ></div>
                 </div>
@@ -762,19 +762,19 @@ const StepperBooking: React.FC = () => {
         </div>
       </div>
 
-      <div className="mb-10 bg-white p-6 rounded-lg shadow-md">
+      <div className='mb-10 bg-white rounded-lg shadow-md'>
         {renderStepContent()}
       </div>
 
-      <div className="mt-8 flex flex-col md:flex-row gap-4">
+      <div className='mt-8 flex flex-col md:flex-row gap-4'>
         {buttonClicked && errorList.length > 0 && currentStep === 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full">
-            <h3 className="text-red-700 font-medium mb-2">
+          <div className='bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full'>
+            <h3 className='text-red-700 font-medium mb-2'>
               Please correct the following errors:
             </h3>
-            <ul className="list-disc pl-5">
+            <ul className='list-disc pl-5'>
               {errorList.map((field, index) => (
-                <li className="text-red-600 text-sm" key={index}>
+                <li className='text-red-600 text-sm' key={index}>
                   {formik.errors[field as keyof typeof formik.errors]
                     ? String(formik.errors[field as keyof typeof formik.errors])
                     : `${field} is required`}
@@ -785,19 +785,19 @@ const StepperBooking: React.FC = () => {
         )}
 
         {couponError && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full">
-            <h3 className="text-red-700 font-medium mb-2">Coupon Error</h3>
-            <p className="text-red-600 text-sm">{couponError}</p>
+          <div className='bg-red-50 border border-red-200 rounded-md p-4 mb-4 w-full'>
+            <h3 className='text-red-700 font-medium mb-2'>Coupon Error</h3>
+            <p className='text-red-600 text-sm'>{couponError}</p>
           </div>
         )}
 
-        <div className="flex gap-4 ml-auto">
+        <div className='flex gap-4 ml-auto'>
           {currentStep === 0 ? (
             <button
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
+              className='px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50'
               onClick={handleCustomerInfoSubmit}
               disabled={loading}
-              type="button"
+              type='button'
             >
               {loading ? 'Processing...' : 'Register'}
             </button>

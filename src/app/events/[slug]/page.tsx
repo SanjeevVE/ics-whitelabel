@@ -398,7 +398,7 @@ export default function EventPage() {
     <>
       {renderClosedEventNotification()}
 
-      <section className="p-8">
+      <section className="md:p-8">
         <div className="container mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="w-full lg:w-2/3">
