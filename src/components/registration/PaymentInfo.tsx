@@ -1,9 +1,45 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { baseUrl } from '@/lib/apiConfig';
-import { FormValues } from './StepperBooking';
+import React, { useEffect, useState } from "react";
+import axios, { AxiosResponse } from "axios";
+import { baseUrl } from "@/lib/apiConfig";
+
+interface RegisteredUser {
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobileNumber: string;
+}
+
+interface FormValues {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobileNumber: string;
+  address: string;
+  state: string;
+  country: string;
+  pincode: string;
+  categoryName: string;
+  eventName: string;
+  thumbnail: string;
+  key_id: string;
+  paymentOrderId: string;
+  amount: string;
+  applicationFee: number;
+  gstOnPlatformCharges: number;
+  platformFee: string;
+  gst: string;
+  payableAmount: number;
+  couponCode?: string;
+  membershipId?: string;
+  registeredUsers?: RegisteredUser[];
+  actionUrl: string;
+  surl: string;
+  furl: string;
+  hash: string;
+}
 
 interface Category {
   id: string;
@@ -15,13 +51,8 @@ interface Event {
   id: string;
   slug: string;
   category: Category[];
+  paymentMethod?: string;
   emailBanner?: string;
-}
-
-interface Coupon {
-  couponCode: string;
-  discountAmount?: number;
-  discountPercentage?: number;
 }
 
 interface PaymentInfoProps {
@@ -30,39 +61,103 @@ interface PaymentInfoProps {
   event: Event;
 }
 
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+interface RazorpayOptions {
+  key: string;
+  amount: string;
+  currency: string;
+  name: string;
+  description: string;
+  image: string;
+  order_id: string;
+  prefill: {
+    name: string;
+    email: string;
+    contact: string;
+  };
+  notes: {
+    address: string;
+  };
+  theme: {
+    color: string;
+  };
+  handler: (response: RazorpayResponse) => void;
+  modal: {
+    ondismiss: () => void;
+  };
+}
+
+interface RazorpayResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayError {
+  code: string;
+  description: string;
+  source: string;
+  step: string;
+  reason: string;
+}
+
+interface RazorpayFailedResponse {
+  error: RazorpayError;
+}
+
+interface NotificationResponse {
+  success: boolean;
+  message: string;
+}
+
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => {
+      open(): void;
+      on(event: string, callback: (response: RazorpayFailedResponse) => void): void;
+    };
+  }
+}
+
+type ToastVariant = "success" | "danger";
+
 const PaymentInfo: React.FC<PaymentInfoProps> = ({
   payAmount,
   formValues,
   event,
 }) => {
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastVariant, setToastVariant] = useState('');
-  const [scriptLoaded, setScriptLoaded] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>("");
+  const [toastVariant, setToastVariant] = useState<ToastVariant>("success");
+  const [scriptLoaded, setScriptLoaded] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const findCategory = event?.category?.find(
-    (item) => item?.name === formValues?.categoryName
+  const findCategory: Category | undefined = event?.category?.find(
+    (item: Category) => item?.name === formValues?.categoryName
   );
 
-  const currday = new Date();
-  const orderId = currday.getTime().toString();
+  const currday: Date = new Date();
+  const orderId: string = currday.getTime().toString();
 
   const validatePhoneNumber = (phone: string): boolean => {
-    const cleanPhone = phone.replace(/\D/g, '').replace(/^(\+91|91)?/, '');
-    const indianMobileRegex = /^[6-9]\d{9}$/;
+    const cleanPhone: string = phone.replace(/\D/g, "").replace(/^(\+91|91)?/, "");
+    const indianMobileRegex: RegExp = /^[6-9]\d{9}$/;
     return indianMobileRegex.test(cleanPhone);
   };
 
   const formatPhoneForWhatsApp = (phone: string): string => {
-    let cleanPhone = phone.replace(/\D/g, '');
+    let cleanPhone: string = phone.replace(/\D/g, "");
 
-    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
+    if (cleanPhone.startsWith("91") && cleanPhone.length === 12) {
       cleanPhone = cleanPhone.substring(2);
     }
 
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      console.error('Invalid phone number format:', phone);
+      console.error("Invalid phone number format:", phone);
       return phone;
     }
 
@@ -70,9 +165,9 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   };
 
   const formatPhoneForRazorpay = (phone: string): string => {
-    let cleanPhone = phone.replace(/\D/g, '');
+    let cleanPhone: string = phone.replace(/\D/g, "");
 
-    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
+    if (cleanPhone.startsWith("91") && cleanPhone.length === 12) {
       cleanPhone = cleanPhone.substring(2);
     }
 
@@ -83,26 +178,27 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     return phone;
   };
 
-  const validateFormData = (): { isValid: boolean; errors: string[] } => {
+
+  const validateFormData = (): ValidationResult => {
     const errors: string[] = [];
 
-    const phoneNumber = formValues.mobileNumber || '';
+    const phoneNumber: string = formValues.mobileNumber || "";
     if (!phoneNumber) {
-      errors.push('Phone number is required');
+      errors.push("Phone number is required");
     } else if (!validatePhoneNumber(phoneNumber)) {
       errors.push(
-        'Please enter a valid Indian mobile number (10 digits starting with 6, 7, 8, or 9)'
+        "Please enter a valid Indian mobile number (10 digits starting with 6, 7, 8, or 9)"
       );
     }
 
     if (!formValues.firstName?.trim()) {
-      errors.push('First name is required');
+      errors.push("First name is required");
     }
     if (!formValues.lastName?.trim()) {
-      errors.push('Last name is required');
+      errors.push("Last name is required");
     }
     if (!formValues.email?.trim()) {
-      errors.push('Email is required');
+      errors.push("Email is required");
     }
 
     return {
@@ -112,43 +208,80 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   };
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    const script: HTMLScriptElement = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
-    script.onload = () => {
-      console.log('Razorpay script loaded successfully');
+    script.onload = (): void => {
+      console.log("Razorpay script loaded successfully");
       setScriptLoaded(true);
     };
-    script.onerror = () => {
-      console.error('Failed to load Razorpay script');
-      setToastVariant('danger');
+    script.onerror = (): void => {
+      console.error("Failed to load Razorpay script");
+      setToastVariant("danger");
       setToastMessage(
-        'Failed to load payment gateway. Please refresh the page and try again.'
+        "Failed to load payment gateway. Please refresh the page and try again."
       );
       setShowToast(true);
     };
 
     document.body.appendChild(script);
 
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('orderId', orderId);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("orderId", orderId);
     }
 
-    return () => {
+    return (): void => {
       if (document.body.contains(script)) {
         document.body.removeChild(script);
       }
     };
   }, [orderId]);
 
-  const sendNotifications = async () => {
+  const submitPayU = (): void => {
+    const form: HTMLFormElement = document.createElement("form");
+    form.method = "POST";
+    form.action = formValues.actionUrl;
+    form.style.display = "none";
+
+    const fields: Record<string, string> = {
+      key: formValues.key_id,
+      txnid: formValues.paymentOrderId,
+      amount: formValues.amount,
+      productinfo: formValues.eventName,
+      firstname: formValues?.registeredUsers
+        ? formValues?.registeredUsers[0]?.firstName
+        : formValues.firstName,
+      email: formValues?.registeredUsers
+        ? formValues?.registeredUsers[0]?.email
+        : formValues.email,
+      phone: formValues?.registeredUsers
+        ? formValues?.registeredUsers[0]?.mobileNumber
+        : formValues.mobileNumber,
+      surl: formValues.surl,
+      furl: formValues.furl,
+      hash: formValues.hash,
+    };
+
+    for (const name in fields) {
+      const input: HTMLInputElement = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = fields[name];
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  };
+
+  const sendNotifications = async (): Promise<void> => {
     if (isProcessing) return;
 
-    const validation = validateFormData();
+    const validation: ValidationResult = validateFormData();
     if (!validation.isValid) {
-      setToastVariant('danger');
+      setToastVariant("danger");
       setToastMessage(
-        `Please fix the following errors: ${validation.errors.join(', ')}`
+        `Please fix the following errors: ${validation.errors.join(", ")}`
       );
       setShowToast(true);
       return;
@@ -157,9 +290,9 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     setIsProcessing(true);
 
     try {
-      const runnerId = formValues?.id;
+      const runnerId: string = formValues?.id;
 
-      const response = await axios.post(
+      const response: AxiosResponse<NotificationResponse> = await axios.post(
         `${baseUrl}/users/sendnotifications`,
         null,
         {
@@ -171,28 +304,28 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
       );
 
       if (response.status === 200) {
-        const successUserId = formValues?.id;
-        console.log('Notifications sent successfully:', response.data);
-        setToastVariant('success');
-        setToastMessage('Registration completed successfully!');
+        const successUserId: string = formValues?.id;
+        console.log("Notifications sent successfully:", response.data);
+        setToastVariant("success");
+        setToastMessage("Registration completed successfully!");
         setShowToast(true);
 
         setTimeout(() => {
           window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
         }, 1500);
       } else {
-        console.warn('Failed to send notifications:', response.data);
-        setToastVariant('danger');
-        setToastMessage('Failed to complete registration. Please try again.');
+        console.warn("Failed to send notifications:", response.data);
+        setToastVariant("danger");
+        setToastMessage("Failed to complete registration. Please try again.");
         setShowToast(true);
       }
     } catch (error: any) {
       console.error(
-        'Error sending notifications:',
+        "Error sending notifications:",
         error.response?.data?.error || error.message
       );
 
-      let errorMessage = 'An error occurred. Please try again.';
+      let errorMessage: string = "An error occurred. Please try again.";
 
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
@@ -202,7 +335,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         errorMessage = error.message;
       }
 
-      setToastVariant('danger');
+      setToastVariant("danger");
       setToastMessage(errorMessage);
       setShowToast(true);
     } finally {
@@ -210,16 +343,16 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     }
   };
 
-  const launchPayment = (e: React.MouseEvent) => {
+  const launchPayment = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
 
     if (isProcessing) return;
 
-    const validation = validateFormData();
+    const validation: ValidationResult = validateFormData();
     if (!validation.isValid) {
-      setToastVariant('danger');
+      setToastVariant("danger");
       setToastMessage(
-        `Please fix the following errors: ${validation.errors.join(', ')}`
+        `Please fix the following errors: ${validation.errors.join(", ")}`
       );
       setShowToast(true);
       return;
@@ -227,13 +360,13 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
 
     if (
       !scriptLoaded ||
-      typeof window === 'undefined' ||
-      !(window as any).Razorpay
+      typeof window === "undefined" ||
+      !window.Razorpay
     ) {
-      console.error('Razorpay not loaded');
-      setToastVariant('danger');
+      console.error("Razorpay not loaded");
+      setToastVariant("danger");
       setToastMessage(
-        'Payment gateway not available. Please refresh the page.'
+        "Payment gateway not available. Please refresh the page."
       );
       setShowToast(true);
       return;
@@ -242,13 +375,13 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
     setIsProcessing(true);
 
     try {
-      const phoneNumber = formValues.mobileNumber || '';
-      const formattedPhone = formatPhoneForRazorpay(phoneNumber);
+      const phoneNumber: string = formValues.mobileNumber || "";
+      const formattedPhone: string = formatPhoneForRazorpay(phoneNumber);
 
-      const options = {
+      const options: RazorpayOptions = {
         key: formValues.key_id,
         amount: formValues.amount,
-        currency: 'INR',
+        currency: "INR",
         name: formValues.eventName,
         description: formValues.categoryName,
         image: formValues.thumbnail,
@@ -262,54 +395,54 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
           address: `${formValues.address}, ${formValues.state}, ${formValues.country}, ${formValues.pincode}`,
         },
         theme: {
-          color: '#3399cc',
+          color: "#3399cc",
         },
-        handler: function (response: any) {
-          console.log('Payment successful, response:', response);
+        handler: function (response: RazorpayResponse): void {
+          console.log("Payment successful, response:", response);
           setIsProcessing(false);
           setShowToast(true);
-          setToastVariant('success');
-          setToastMessage('Payment successful! Redirecting...');
+          setToastVariant("success");
+          setToastMessage("Payment successful! Redirecting...");
 
           setTimeout(() => {
-            const successUserId = formValues?.id;
+            const successUserId: string = formValues?.id;
             window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
           }, 1500);
         },
         modal: {
-          ondismiss: function () {
+          ondismiss: function (): void {
             setIsProcessing(false);
-            console.log('Payment modal closed');
+            console.log("Payment modal closed");
           },
         },
       };
 
-      const razorpay = new (window as any).Razorpay(options);
+      const razorpay = new window.Razorpay(options);
 
-      razorpay.on('payment.failed', function (response: any) {
-        console.error('Payment failed:', response.error);
+      razorpay.on("payment.failed", function (response: RazorpayFailedResponse): void {
+        console.error("Payment failed:", response.error);
         setIsProcessing(false);
-        setToastVariant('danger');
+        setToastVariant("danger");
         setToastMessage(
-          `Payment failed: ${response.error.description || 'Please try again'}`
+          `Payment failed: ${response.error.description || "Please try again"}`
         );
         setShowToast(true);
       });
 
       razorpay.open();
     } catch (error) {
-      console.error('Error opening Razorpay:', error);
+      console.error("Error opening Razorpay:", error);
       setIsProcessing(false);
-      setToastVariant('danger');
-      setToastMessage('Failed to initialize payment. Please try again.');
+      setToastVariant("danger");
+      setToastMessage("Failed to initialize payment. Please try again.");
       setShowToast(true);
     }
   };
 
-  const calculateDiscount = () => {
-    if (!formValues?.couponCode) return 0;
+  const calculateDiscount = (): string => {
+    if (!formValues?.couponCode) return "0";
 
-    return (
+    const discount = (
       Math.round(
         (Number(findCategory?.amount || 0) +
           Number(formValues?.applicationFee || 0) +
@@ -317,21 +450,28 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
           Number(formValues?.amount || 0)) *
           100
       ) / 100
-    ).toFixed(2);
+    );
+
+    return discount.toFixed(2);
   };
 
-  const handleButtonClick = (e: React.MouseEvent) => {
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     if (isProcessing) return;
 
     if (formValues.payableAmount === 0 || formValues.payableAmount === null) {
       sendNotifications();
+      return;
+    }
+
+    if (event?.paymentMethod === "payu") {
+      submitPayU();
     } else {
       launchPayment(e);
     }
   };
 
-  const phoneNumber = formValues.mobileNumber || '';
-  const isPhoneValid = phoneNumber ? validatePhoneNumber(phoneNumber) : true;
+  const phoneNumber: string = formValues.mobileNumber || "";
+  const isPhoneValid: boolean = phoneNumber ? validatePhoneNumber(phoneNumber) : true;
 
   return (
     <div className="container mx-auto text-center mt-8">
@@ -399,7 +539,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                           GST On Platform Charges:
                         </th>
                         <td className="p-3 text-right font-semibold">
-                          ₹{' '}
+                          ₹{" "}
                           {((formValues?.applicationFee * 18) / 100).toFixed(2)}
                         </td>
                       </tr>
@@ -440,8 +580,8 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                         isProcessing ||
                         !isPhoneValid ||
                         ((formValues.payableAmount ?? 0) > 0 && !scriptLoaded)
-                          ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                          : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                          ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                          : "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
                       }`}
                       onClick={handleButtonClick}
                       disabled={
@@ -451,11 +591,11 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                       }
                     >
                       {isProcessing
-                        ? 'Processing...'
+                        ? "Processing..."
                         : formValues.payableAmount === 0 ||
                           formValues.payableAmount === null
-                        ? 'Complete Registration'
-                        : 'Proceed to Pay'}
+                        ? "Complete Registration"
+                        : "Proceed to Pay"}
                     </button>
                   </td>
                 </tr>
@@ -472,9 +612,9 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
           {showToast && (
             <div
               className={`fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-                toastVariant === 'success'
-                  ? 'bg-green-100 text-green-800 border border-green-400'
-                  : 'bg-red-100 text-red-800 border border-red-400'
+                toastVariant === "success"
+                  ? "bg-green-100 text-green-800 border border-green-400"
+                  : "bg-red-100 text-red-800 border border-red-400"
               }`}
               role="alert"
             >
