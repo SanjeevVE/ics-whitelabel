@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { baseUrl } from '@/lib/apiConfig';
-import { FormValues } from './StepperBooking';
+import { FormValues } from './singleRegistration/StepperBooking-SingleRegistration';
 
 interface Category {
   id: string;

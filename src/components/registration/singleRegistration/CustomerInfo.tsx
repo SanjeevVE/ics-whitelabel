@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { FormikProps } from 'formik';
-import TermsAndConditionModal from './TermsAndConditionModal';
-import { getRunnerClubs } from '../../lib/backendApis';
+import TermsAndConditionModal from '../TermsAndConditionModal';
+import { getRunnerClubs } from '../../../lib/backendApis';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 

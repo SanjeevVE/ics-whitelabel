@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
-import CustomerInfo from "@/components/registration/CustomerInfo";
-import PaymentInfo from "../registration/PaymentInfo";
+import CustomerInfo from "@/components/registration/singleRegistration/CustomerInfo";
+import PaymentInfo from "../PaymentInfo";
 import BlockingLoader from "@/components/common/Loader";
 import {
   getEventBySlug,
@@ -95,7 +95,8 @@ export interface FormValues {
   country: string;
   emergencyContactName: string;
   emergencyContactNumber: string;
-  categoryName: string;
+  categoryName: string | string[]; // Changed to support both string and array
+  categoryId?: string | string[]; // Added to track category IDs
   couponCode?: string;
   runnerClub?: string;
   company: string;
@@ -440,15 +441,24 @@ const MultipleBooking: React.FC = () => {
           return value !== this.parent.mobileNumber;
         }
       ),
-    categoryName: Yup.string().required("Category Name is required"),
+    categoryName: Yup.mixed()
+      .required("Category Name is required")
+      .test('is-valid-category', 'At least one category must be selected', function(value) {
+        // Accept both string and array formats
+        if (typeof value === 'string') return value.trim() !== '';
+        if (Array.isArray(value)) return value.length > 0;
+        return false;
+      }),
     termsAndConditions: Yup.boolean()
       .oneOf([true], "You must agree to the terms")
       .required("Terms acceptance is required"),
 
     teamName: Yup.string().when("categoryName", {
-      is: (categoryName: string) => {
+      is: (categoryName: string | string[]) => {
+        // Handle both string and array cases
+        const catName = Array.isArray(categoryName) ? categoryName[0] : categoryName;
         const category = event?.category?.find(
-          (cat) => cat.name === categoryName
+          (cat) => cat.name === catName
         );
         return category?.isRelay === "YES";
       },
@@ -457,9 +467,11 @@ const MultipleBooking: React.FC = () => {
       otherwise: () => Yup.string(),
     }),
     teamContactPersonNumber: Yup.string().when("categoryName", {
-      is: (categoryName: string) => {
+      is: (categoryName: string | string[]) => {
+        // Handle both string and array cases
+        const catName = Array.isArray(categoryName) ? categoryName[0] : categoryName;
         const category = event?.category?.find(
-          (cat) => cat.name === categoryName
+          (cat) => cat.name === catName
         );
         return category?.isRelay === "YES";
       },
@@ -635,7 +647,9 @@ const MultipleBooking: React.FC = () => {
       const categoryErrors = [];
 
       // Check if a category is selected
-      if (!formik.values.categoryName) {
+      if (!formik.values.categoryName || 
+          (Array.isArray(formik.values.categoryName) && formik.values.categoryName.length === 0) ||
+          (typeof formik.values.categoryName === 'string' && formik.values.categoryName.trim() === '')) {
         categoryErrors.push("Please select a category");
       }
 
@@ -666,7 +680,7 @@ const MultipleBooking: React.FC = () => {
       }
 
       // Move to next step (personal details)
-      setCurrentStep(1);
+      setCurrentStep(prevStep => prevStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       // For personal details step, validate and submit
@@ -689,20 +703,38 @@ const MultipleBooking: React.FC = () => {
     formik.setFieldValue("teamContactPersonNumber", contactNumber);
   };
 
-  // FIXED: Updated participants update handler
-  const handleParticipantsUpdate = (
+  // Updated participants update handler with memoization to prevent unnecessary re-renders
+  const handleParticipantsUpdate = useCallback((
     totalParticipants: number,
     allEmpty: boolean
   ) => {
-    console.log("Participants updated:", { totalParticipants, allEmpty });
-    setTotalRegistrations(totalParticipants);
-    setTotalParticipants(totalParticipants);
-  };
+    // Only log and update if values have changed
+    setTotalRegistrations(prevTotal => {
+      if (prevTotal !== totalParticipants) {
+        console.log("Participants updated:", { totalParticipants, allEmpty });
+        return totalParticipants;
+      }
+      return prevTotal;
+    });
+    
+    setTotalParticipants(prevTotal => {
+      if (prevTotal !== totalParticipants) {
+        return totalParticipants;
+      }
+      return prevTotal;
+    });
+  }, []);
 
-  const handleStoreParticipants = (participants: any[]) => {
-    console.log("Storing participants:", participants);
-    setRegisteredParticipants(participants);
-  };
+  const handleStoreParticipants = useCallback((participants: any[]) => {
+    // Only update if the participants array has changed
+    setRegisteredParticipants(prevParticipants => {
+      if (JSON.stringify(prevParticipants) !== JSON.stringify(participants)) {
+        console.log("Storing participants:", participants);
+        return participants;
+      }
+      return prevParticipants;
+    });
+  }, []);
 
   const handleFindCoupon = (couponCode: string) => {
     if (earlyBirdCoupon && earlyBirdCoupon.couponCode === couponCode) {
@@ -716,12 +748,38 @@ const MultipleBooking: React.FC = () => {
   const handleCategorySelect = (category: Category | null) => {
     console.log("Category selected:", category);
     setSelectedCategory(category);
-    formik.setFieldValue("categoryName", category?.name || "");
-    formik.setFieldValue("distance", category?.distance || "");
-
-    setCounts({});
-    setTotalAmount(0);
-    setTotalRegistrations(0);
+    
+    // Get existing categories if any
+    const existingCategories = formik.values.categoryName;
+    let newCategoryNames: string[] = [];
+    
+    if (category) {
+      if (typeof existingCategories === 'string') {
+        // Convert to array if it was a string
+        newCategoryNames = existingCategories ? [existingCategories, category.name] : [category.name];
+      } else if (Array.isArray(existingCategories)) {
+        // Add to existing array if not already included
+        if (!existingCategories.includes(category.name)) {
+          newCategoryNames = [...existingCategories, category.name];
+        } else {
+          newCategoryNames = [...existingCategories];
+        }
+      } else {
+        // If no existing categories
+        newCategoryNames = [category.name];
+      }
+      
+      // Update formik values
+      formik.setFieldValue("categoryName", newCategoryNames);
+      formik.setFieldValue("distance", category.distance || "");
+    } else {
+      // If category is null, clear the selection
+      formik.setFieldValue("categoryName", []);
+      formik.setFieldValue("distance", "");
+      setCounts({});
+      setTotalAmount(0);
+      setTotalRegistrations(0);
+    }
   };
 
   const handleCountUpdate = (categoryName: string, count: number, amount: number) => {

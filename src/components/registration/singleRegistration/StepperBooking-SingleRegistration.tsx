@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-hot-toast';
-import CustomerInfo from '@/components/registration/CustomerInfo';
+import CustomerInfo from '@/components/registration/singleRegistration/CustomerInfo';
 import PaymentInfo from '@/components/registration/PaymentInfo';
 import {
   getEventBySlug,
@@ -311,7 +311,13 @@ const registerUser = async (
   }
 };
 
-const StepperBooking: React.FC = () => {
+interface StepperBookingProps {
+  event?: any;
+  selectedCategory?: any;
+  setSelectedCategory?: any;
+}
+
+const StepperBooking: React.FC<StepperBookingProps> = (props) => {
   const { slug } = useParams();
   const eventSlug = typeof slug === 'string' ? slug : '';
   const [currentStep, setCurrentStep] = useState<number>(0);

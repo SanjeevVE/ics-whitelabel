@@ -18,11 +18,11 @@ interface Category {
 }
 
 const StepperBooking = dynamic(
-  () => import("@/components/registration/StepperBooking"),
+  () => import("@/components/registration/singleRegistration/StepperBooking-SingleRegistration"),
   { ssr: false }
 );
 const MultipleBooking = dynamic(
-  () => import("@/components/registration/MultipleBooking"),
+  () => import("@/components/registration/multipleRegistration/StepperBooking-GroupRegistration"),
   { ssr: false }
 );
 
