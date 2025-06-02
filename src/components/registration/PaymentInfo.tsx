@@ -178,7 +178,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
         setShowToast(true);
 
         setTimeout(() => {
-          window.location.href = `https://www.novarace.in/pages/${event?.slug}/success/${successUserId}`;
+          window.location.href = `https://www.novarace.in/pages/${event?.slug}/ics-success/${successUserId}`;
         }, 1500);
       } else {
         console.warn('Failed to send notifications:', response.data);
