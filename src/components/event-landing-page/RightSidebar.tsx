@@ -87,7 +87,7 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
 
       <div className="mt-4 p-6 border border-gray-200 rounded-lg shadow-md bg-white">
         <div className="mb-4 h-64 w-full bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-          {isMapLoading ? (
+          {/* {isMapLoading ? (
             <div className="text-gray-500">Loading map...</div>
           ) : latitude && longitude ? (
             <iframe
@@ -104,6 +104,26 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
             <div className="text-gray-500">
               Could not load map for this location
             </div>
+          )} */}
+
+          {isMapLoading ? (
+            <div className="text-gray-500">Loading map...</div>
+          ) : (
+            <a
+              href="https://www.google.com/maps?q=KTPO+Whitefield"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-full block"
+            >
+              <iframe
+                src="https://maps.google.com/maps?q=KTPO%20Whitefield&output=embed&ll=12.9698,77.6974&z=15&iwloc"
+                width="100%"
+                height="450"
+                allowFullScreen={true}
+                loading="lazy"
+                style={{ pointerEvents: 'none' }}
+              />
+            </a>
           )}
         </div>
 
@@ -256,7 +276,7 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
               href="mailto:support@novarace.in"
               className="hover:text-blue-600"
             >
-              support@novarace.in
+              support@icsevents.in
             </a>
           </div>
         </div>

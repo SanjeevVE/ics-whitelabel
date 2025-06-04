@@ -307,104 +307,119 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     formik.setFieldValue('runnerClub', value);
   };
 
+  // const renderRunnerClubField = () => {
+  //   return (
+  //     <React.Fragment>
+  //       <div className="relative">
+  //         <div
+  //           className={`w-full p-2 border rounded-md flex justify-between items-center cursor-pointer ${
+  //             !formik.values.categoryName ? 'border-gray-300' : ''
+  //           }`}
+  //           onClick={() => {
+  //             if (formik.values.categoryName) {
+  //               setIsDropdownOpen(!isDropdownOpen);
+  //             }
+  //           }}
+  //         >
+  //           <span className="truncate">
+  //             {formik.values.runnerClub || 'Select Runner Club'}
+  //           </span>
+  //           <svg
+  //             xmlns="http://www.w3.org/2000/svg"
+  //             className="h-5 w-5"
+  //             fill="none"
+  //             viewBox="0 0 24 24"
+  //             stroke="currentColor"
+  //           >
+  //             <path
+  //               strokeLinecap="round"
+  //               strokeLinejoin="round"
+  //               strokeWidth={2}
+  //               d="M19 9l-7 7-7-7"
+  //             />
+  //           </svg>
+  //         </div>
+
+  //         {isDropdownOpen && (
+  //           <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+  //             <div className="p-2">
+  //               <input
+  //                 type="text"
+  //                 className="w-full p-2 border border-gray-200 rounded-md"
+  //                 placeholder="Search club..."
+  //                 value={searchTerm}
+  //                 onChange={(e) => setSearchTerm(e.target.value)}
+  //               />
+  //             </div>
+
+  //                 <div
+  //     className="p-2 hover:bg-gray-100 cursor-pointer text-red-500 border-t border-gray-200"
+  //     onClick={() => {
+  //       handleClubSelect('');
+  //       setIsDropdownOpen(false);
+  //       setSearchTerm('');
+  //     }}
+  //   >
+  //     Clear Selection
+  //   </div>
+
+  //             {isLoading ? (
+  //               <div className="p-3 text-center text-gray-500">
+  //                 Loading clubs...
+  //               </div>
+  //             ) : filteredClubs.length > 0 ? (
+  //               <div>
+  //                 {filteredClubs.map((club, index) => (
+  //                   <div
+  //                     key={index}
+  //                     className="p-2 hover:bg-gray-100 cursor-pointer"
+  //                     onClick={() => {
+  //                       handleClubSelect(club.name);
+  //                       setIsDropdownOpen(false);
+  //                       setSearchTerm('');
+  //                     }}
+  //                   >
+  //                     {club.name}
+  //                   </div>
+  //                 ))}
+  //               </div>
+  //             ) : (
+  //               <div className="p-3 text-center text-gray-500">
+  //                 No matching clubs
+  //               </div>
+  //             )}
+  //           </div>
+  //         )}
+
+  //         {showOthersField && (
+  //           <div className="mt-2">
+  //             <input
+  //               type="text"
+  //               placeholder="Enter your club name"
+  //               value={otherClubName}
+  //               onChange={handleOtherClubChange}
+  //               className="w-full p-2 border border-gray-300 rounded-md"
+  //               disabled={!formik.values.categoryName}
+  //             />
+  //           </div>
+  //         )}
+  //       </div>
+  //     </React.Fragment>
+  //   );
+  // };
+
   const renderRunnerClubField = () => {
     return (
-      <React.Fragment>
-        <div className="relative">
-          <div
-            className={`w-full p-2 border rounded-md flex justify-between items-center cursor-pointer ${
-              !formik.values.categoryName ? 'border-gray-300' : ''
-            }`}
-            onClick={() => {
-              if (formik.values.categoryName) {
-                setIsDropdownOpen(!isDropdownOpen);
-              }
-            }}
-          >
-            <span className="truncate">
-              {formik.values.runnerClub || 'Select Runner Club'}
-            </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-
-          {isDropdownOpen && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-              <div className="p-2">
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-200 rounded-md"
-                  placeholder="Search club..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-                  <div
-      className="p-2 hover:bg-gray-100 cursor-pointer text-red-500 border-t border-gray-200"
-      onClick={() => {
-        handleClubSelect('');
-        setIsDropdownOpen(false);
-        setSearchTerm('');
-      }}
-    >
-      Clear Selection
-    </div>
-
-              {isLoading ? (
-                <div className="p-3 text-center text-gray-500">
-                  Loading clubs...
-                </div>
-              ) : filteredClubs.length > 0 ? (
-                <div>
-                  {filteredClubs.map((club, index) => (
-                    <div
-                      key={index}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        handleClubSelect(club.name);
-                        setIsDropdownOpen(false);
-                        setSearchTerm('');
-                      }}
-                    >
-                      {club.name}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-3 text-center text-gray-500">
-                  No matching clubs
-                </div>
-              )}
-            </div>
-          )}
-
-          {showOthersField && (
-            <div className="mt-2">
-              <input
-                type="text"
-                placeholder="Enter your club name"
-                value={otherClubName}
-                onChange={handleOtherClubChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                disabled={!formik.values.categoryName}
-              />
-            </div>
-          )}
-        </div>
-      </React.Fragment>
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Enter your club name"
+          value={formik.values.runnerClub || ''}
+          onChange={(e) => formik.setFieldValue('runnerClub', e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md"
+          disabled={!formik.values.categoryName}
+        />
+      </div>
     );
   };
 
