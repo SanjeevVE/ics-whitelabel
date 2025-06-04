@@ -156,7 +156,7 @@ const RightSidebar = ({ event, formatEventDate }: RightSidebarProps) => {
         <div className="border-t border-gray-200 my-4"></div>
 
         <div>
-          <h3 className="text-lg font-bold mb-2">Organiser Details:</h3>
+          <h3 className="text-lg font-bold mb-2">Contact Details:</h3>
           {event.orgEmail && (
             <div className="flex items-center mb-2">
               <svg
