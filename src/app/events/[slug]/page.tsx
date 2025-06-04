@@ -197,12 +197,12 @@ export default function EventPage() {
                     <span className="font-bold">{item.minimumAge}</span>
                   </div>
                 )}
-                {item.maximumAge && (
+                {/* {item.maximumAge && (
                   <div>
                     Maximum Age:{' '}
                     <span className="font-bold">{item.maximumAge}</span>
                   </div>
-                )}
+                )} */}
                 {item.distance && (
                   <div>
                     Distance: <span className="font-bold">{item.distance}</span>
