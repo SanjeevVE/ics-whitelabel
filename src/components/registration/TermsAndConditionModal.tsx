@@ -48,8 +48,8 @@ const TermsAndConditionModal: React.FC<TermsAndPolicyModalProps> = ({
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">1. Participant Responsibilities</h3>
               <p>
-                By registering for an event, participants accept full responsibility for their health, safety, and conduct throughout the event. Compliance with all event rules and organizer instructions is mandatory.
-              </p>
+                I declare that I am not suffering from any health condition, and I am physically and psychologically well prepared to participate in this run. I do not have any cardiorespiratory disease, physical defect, or injury, which would discourage my participation. I am participating voluntarily and under my own responsibility. Consequently, I exonerate the organizers, collaborators, sponsors, and any other participants of any liabilities for any physical or material damage that occurs to me during the event.
+</p>
 
               <h3 className="text-lg font-semibold">2. Personal Information</h3>
               <p>
