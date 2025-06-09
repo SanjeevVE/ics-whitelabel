@@ -1159,7 +1159,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
 
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-start mb-4">
-              <div className="flex items-center h-5">
+              {/* <div className="flex items-center h-5">
                 <input
                   type="checkbox"
                   id="termsAndConditions"
@@ -1174,10 +1174,10 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
                       : ''
                   }`}
                 />
-              </div>
+              </div> */}
               <div className="ml-3 text-sm">
                 <label htmlFor="termsAndConditions" className="text-gray-700">
-                  I agree to the {''}
+                  Click and agree the {''}
                   <span
                     className="text-blue-600 cursor-pointer"
                     onClick={openTermsModal}
@@ -1199,8 +1199,9 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
       <TermsAndConditionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        type={modalType}
+        formik={formik}
       />
+
     </div>
   );
 };
