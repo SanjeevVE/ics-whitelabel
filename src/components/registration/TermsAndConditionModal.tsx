@@ -69,7 +69,11 @@ const TermsAndConditionModal: React.FC<TermsAndConditionModalProps> = ({
 
           <h3 className="text-lg font-semibold">6. Insurance Liability</h3>
           <p>
-            SAP will not be responsible for taking any kind of insurance on behalf of the participant.
+            SAP is organizing the event/run solely in the capacity of a facilitator. SAP shall not be held liable for procuring or maintaining any form of insurance coverage on behalf of any participant or runner. Each participant is individually responsible for securing their own insurance, whether health, accident, or liability, as deemed necessary for their participation in the event.
+ 
+By choosing to participate in the event/run, all participants expressly waive any and all claims against SAP, its employees, partners, and the general public for any injury, accident, loss, or damage that may arise during the course of the event.
+ 
+Furthermore, participant(s) acknowledge that they are physically fit and capable of participating in the event and voluntarily assume full responsibility for any risks associated with their participation.
           </p>
 
           <h3 className="text-lg font-semibold">7. Agreement to Terms</h3>
