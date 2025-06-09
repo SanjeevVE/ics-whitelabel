@@ -364,7 +364,7 @@ const StepperBooking: React.FC = () => {
     nameOfTheBib: '',
     educationInstitution: '',
     medicalConditions: '',
-    termsAndConditions: false,
+    termsAndConditions: true,
     hearAboutUs: '',
     race: event?.race?.[0] || '',
     distance: '',
