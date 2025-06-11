@@ -5,6 +5,11 @@ interface LayoutProps {
   params: Promise<{ slug: string }>;
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   return await generateEventMetadata({ params: resolvedParams }, false);

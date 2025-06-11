@@ -4,7 +4,6 @@ interface MetaProps {
   title?: string;
   description?: string;
   keywords?: string;
-  viewport?: string;
   canonical?: string;
   ogImage?: string;
   ogType?: "website" | "article" | "profile";
@@ -17,7 +16,6 @@ export function generateMetadata({
   title = 'Event Management Platform',
   description = 'Join the community of runners, cyclists, and fitness enthusiasts across India. Discover and register for exciting upcoming events!',
   keywords = 'running, cycling, marathon, events, fitness, sports, India, registration',
-  viewport,
   canonical,
   ogImage = '/images/og-default.jpg',
   ogType = 'website',
@@ -36,7 +34,6 @@ export function generateMetadata({
     title,
     description,
     keywords,
-    viewport: viewport || 'width=device-width, initial-scale=1',
     alternates: {
       canonical: canonicalUrl,
     },

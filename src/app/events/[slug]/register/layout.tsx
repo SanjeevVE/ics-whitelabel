@@ -1,6 +1,11 @@
 import { Metadata } from 'next';
 import { generateEventMetadata } from '@/utils/eventMetadata';
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export async function generateMetadata({
   params,
 }: {

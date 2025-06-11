@@ -1,6 +1,7 @@
 import "./globals.css";
 import { ReactNode } from "react";
 import { generateMetadata } from "@/utils/metadata";
+import ThirdPartyScripts from '@/components/ThirdPartyScripts';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -22,7 +23,7 @@ export const viewport = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning>
         {children}
       </body>
     </html>
