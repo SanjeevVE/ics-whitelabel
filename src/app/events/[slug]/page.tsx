@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import RightSidebar from '@/components/event-landing-page/RightSidebar';
+import ClientOnly from '@/components/ClientOnly';
 
 import Tshirt from '../../../../public/img/event-landing-page/tshirt.png';
 import Medal from '../../../../public/img/event-landing-page/medal.png';
@@ -104,10 +105,20 @@ export default function EventPage() {
   }
 
   function formatEventDate(dateString: string) {
-    const date = new Date(dateString);
-    return !isNaN(date.getTime())
-      ? format(date, 'MMMM dd, yyyy - EEEE')
-      : dateString;
+    // Return a simple string during server-side rendering
+    if (typeof window === 'undefined') {
+      return dateString;
+    }
+    
+    // Only format dates on the client side
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      
+      return format(date, 'MMMM dd, yyyy - EEEE');
+    } catch (e) {
+      return dateString;
+    }
   }
 
   function getFormattedDate() {
@@ -141,6 +152,9 @@ export default function EventPage() {
 
   async function fetchLocationCoordinates(location: string) {
     try {
+      // Only run on client-side
+      if (typeof window === 'undefined') return;
+      
       const geocodeResponse = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
           location
@@ -304,6 +318,7 @@ export default function EventPage() {
           alt={event.eventName}
           width={1200}
           height={600}
+          priority={true}
           className="w-full h-auto rounded-lg"
         />
       </div>
@@ -372,8 +387,31 @@ export default function EventPage() {
 
     return (
       <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-3">Event Details</h2>
-        <div className="mb-6">
+        <h2 className="text-2xl font-semibold">Event Details</h2>
+        <br />
+        <p className="mb-1">
+          <strong>Event Name:</strong> SAP RUN 2025
+        </p>
+        <br />
+        <p className="mb-1">
+          <strong>Event Date:</strong> 3rd August 2025
+        </p>
+        <br />
+
+        <p className="mb-2 font-bold">Categories:</p>
+        <ul className="list-disc list-inside space-y-1">
+          <li>
+            3K : <span className="line-through">₹500</span> → ₹0
+          </li>
+          <li>
+            5K : <span className="line-through">₹600</span> → ₹0
+          </li>
+          <li>
+            10K : <span className="line-through">₹800</span> → ₹0
+          </li>
+        </ul>
+
+        <div className="mb-6 mt-6">
           <h2 className="text-lg font-semibold mb-3">
             Chief Guest for 2025: Jonty Rhodes
           </h2>
