@@ -8,12 +8,16 @@ interface RootLayoutProps {
 
 export const metadata = generateMetadata({
   title: "Event Management Platform",
-  viewport: "width=device-width, initial-scale=1",
   description: "Join the community of runners, cyclists, and fitness enthusiasts across India. Discover and register for exciting upcoming events!",
   keywords: "running, cycling, marathon, events, fitness, sports, India, registration",
   ogImage: "/images/og-default.jpg",
   ogType: "website"
 });
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (

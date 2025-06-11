@@ -276,9 +276,7 @@ export default function EventPage() {
           role="alert"
         >
           <h4 className="font-bold">Event Not Found</h4>
-          <p>
-            Sorry, we couldn&apos;t find the event you&apos;re looking for.
-          </p>
+          <p>Sorry, we couldn&apos;t find the event you&apos;re looking for.</p>
         </div>
       </div>
     );
@@ -355,6 +353,7 @@ export default function EventPage() {
                       giveAwayImages[item.name as keyof typeof giveAwayImages]
                     }
                     alt={item.name}
+                    priority
                     width={60}
                     height={60}
                   />
@@ -374,6 +373,33 @@ export default function EventPage() {
     return (
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-3">Event Details</h2>
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-3">
+            Chief Guest for 2025: Jonty Rhodes
+          </h2>
+
+          <div className="relative w-full max-w-xl h-80 mb-4 mx-auto rounded-lg overflow-hidden">
+            <Image
+              src="/img/ics/Sap-chief-guest.jpg"
+              alt="Chief Guest - Jonty Rhodes"
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          <p className="text-gray-700 leading-relaxed">
+            Jonty Rhodes is a South African professional cricket coach,
+            commentator and former Test and One Day International cricketer. He
+            is regarded as one of the greatest fielders of all time and was the
+            first South African cricketer to take 100 ODI catches. He played for
+            the South African cricket team between 1992 and 2003. He is the
+            fielding coach of the Lucknow Super Giants in the Indian Premier
+            League. He is the fielding coach of Durban&apos;s Super Giants as
+            well as the consultant fielding coach of the Sri Lanka national
+            cricket team.
+          </p>
+        </div>
+
         <EventOverview event={event} />
       </div>
     );
