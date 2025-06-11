@@ -353,6 +353,7 @@ export default function EventPage() {
                       giveAwayImages[item.name as keyof typeof giveAwayImages]
                     }
                     alt={item.name}
+                    priority
                     width={60}
                     height={60}
                   />
@@ -377,11 +378,15 @@ export default function EventPage() {
             Chief Guest for 2025: Jonty Rhodes
           </h2>
 
-          <img
-            src="/img/ics/Sap-chief-guest.jpg"
-            alt="Chief Guest - Jonty Rhodes"
-            className="w-full max-w-xl max-h-80 object-cover rounded-lg mb-4 mx-auto"
-          />
+          <div className="relative w-full max-w-xl h-80 mb-4 mx-auto rounded-lg overflow-hidden">
+            <Image
+              src="/img/ics/Sap-chief-guest.jpg"
+              alt="Chief Guest - Jonty Rhodes"
+              fill
+              className="object-cover"
+            />
+          </div>
+
           <p className="text-gray-700 leading-relaxed">
             Jonty Rhodes is a South African professional cricket coach,
             commentator and former Test and One Day International cricketer. He
@@ -389,9 +394,9 @@ export default function EventPage() {
             first South African cricketer to take 100 ODI catches. He played for
             the South African cricket team between 1992 and 2003. He is the
             fielding coach of the Lucknow Super Giants in the Indian Premier
-            League. He is the fielding coach of Durban's Super Giants as well as
-            the consultant fielding coach of the Sri Lanka national cricket
-            team.
+            League. He is the fielding coach of Durban&apos;s Super Giants as
+            well as the consultant fielding coach of the Sri Lanka national
+            cricket team.
           </p>
         </div>
 
