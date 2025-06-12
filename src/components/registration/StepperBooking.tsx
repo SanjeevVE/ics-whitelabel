@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-hot-toast';
@@ -313,6 +313,8 @@ const registerUser = async (
 
 const StepperBooking: React.FC = () => {
   const { slug } = useParams();
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams.get('name');
   const eventSlug = typeof slug === 'string' ? slug : '';
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formValues, setFormValues] = useState<FormValues | null>(null);
@@ -331,49 +333,60 @@ const StepperBooking: React.FC = () => {
 
   const getInitialFormValues = (
     event: Event | null,
-    earlyBirdCoupon: Coupon | null
-  ): FormValues => ({
-    firstName: '',
-    lastName: '',
-    email: '',
-    mobileNumber: '',
-    gender: '',
-    dateOfBirth: '',
-    eventId: event?.id || null,
-    eventName: event?.eventName || '',
-    eventType: event?.eventType || '',
-    eventSlug: event?.slug || '',
-    registrationOpenDate: event?.regOpenDate || null,
-    registrationCloseDate: event?.regCloseDate || null,
-    eventDate: event?.date || null,
-    location: event?.location || '',
-    tShirtSize: '',
-    bloodGroup: '',
-    address: '',
-    city: '',
-    pincode: '',
-    state: '',
-    country: event?.location?.split(', ').pop() || '',
-    emergencyContactName: '',
-    emergencyContactNumber: '',
-    categoryName: '',
-    couponCode: earlyBirdCoupon?.couponCode || '',
-    runnerClub: 'None',
-    company: 'None',
-    bibDistributionLocation: '',
-    nameOfTheBib: '',
-    educationInstitution: '',
-    medicalConditions: '',
-    termsAndConditions: true,
-    hearAboutUs: '',
-    race: event?.race?.[0] || '',
-    distance: '',
-    eventTag: event?.tag || '',
-    eventStatus: event?.status || '',
-    platformFee: 0,
-    whatsAppNumber: '',
-    enableWhatsApp: false,
-  });
+    earlyBirdCoupon: Coupon | null,
+    categoryFromUrl: string | null
+  ): FormValues => {
+    let initialCategoryName = '';
+    if (categoryFromUrl && event?.category) {
+      const categoryExists = event.category.some(cat => cat.name === categoryFromUrl);
+      if (categoryExists) {
+        initialCategoryName = categoryFromUrl;
+      }
+    }
+    
+    return {
+      firstName: '',
+      lastName: '',
+      email: '',
+      mobileNumber: '',
+      gender: '',
+      dateOfBirth: '',
+      eventId: event?.id || null,
+      eventName: event?.eventName || '',
+      eventType: event?.eventType || '',
+      eventSlug: event?.slug || '',
+      registrationOpenDate: event?.regOpenDate || null,
+      registrationCloseDate: event?.regCloseDate || null,
+      eventDate: event?.date || null,
+      location: event?.location || '',
+      tShirtSize: '',
+      bloodGroup: '',
+      address: '',
+      city: '',
+      pincode: '',
+      state: '',
+      country: event?.location?.split(', ').pop() || '',
+      emergencyContactName: '',
+      emergencyContactNumber: '',
+      categoryName: initialCategoryName,
+      couponCode: earlyBirdCoupon?.couponCode || '',
+      runnerClub: 'None',
+      company: 'None',
+      bibDistributionLocation: '',
+      nameOfTheBib: '',
+      educationInstitution: '',
+      medicalConditions: '',
+      termsAndConditions: true,
+      hearAboutUs: '',
+      race: event?.race?.[0] || '',
+      distance: '',
+      eventTag: event?.tag || '',
+      eventStatus: event?.status || '',
+      platformFee: 0,
+      whatsAppNumber: '',
+      enableWhatsApp: false,
+    };
+  };
 
   type FormikValues = FormValues;
 
@@ -417,7 +430,7 @@ const StepperBooking: React.FC = () => {
 
   const formik = useFormik<FormikValues>({
     enableReinitialize: true,
-    initialValues: getInitialFormValues(event, earlyBirdCoupon),
+    initialValues: getInitialFormValues(event, earlyBirdCoupon, categoryFromUrl),
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
