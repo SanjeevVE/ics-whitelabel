@@ -105,16 +105,14 @@ export default function EventPage() {
   }
 
   function formatEventDate(dateString: string) {
-    // Return a simple string during server-side rendering
     if (typeof window === 'undefined') {
       return dateString;
     }
-    
-    // Only format dates on the client side
+
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return dateString;
-      
+
       return format(date, 'MMMM dd, yyyy - EEEE');
     } catch (e) {
       return dateString;
@@ -152,9 +150,8 @@ export default function EventPage() {
 
   async function fetchLocationCoordinates(location: string) {
     try {
-      // Only run on client-side
       if (typeof window === 'undefined') return;
-      
+
       const geocodeResponse = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
           location
@@ -425,7 +422,7 @@ export default function EventPage() {
             />
           </div>
 
-          <p className="text-gray-700 leading-relaxed">
+          <p className="text-gray-700 leading-relaxed text-justify">
             Jonty Rhodes is a South African professional cricket coach,
             commentator and former Test and One Day International cricketer. He
             is regarded as one of the greatest fielders of all time and was the
@@ -451,6 +448,20 @@ export default function EventPage() {
         <Link
           href={buildRegistrationLink(event)}
           className="block w-full py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Register Now
+        </Link>
+      </div>
+    );
+  }
+  function renderDesktopRegistrationButton() {
+    if (!event || !isRegistrationOpen(event)) return null;
+
+    return (
+      <div className="mt-8 hidden md:block ">
+        <Link
+          href={buildRegistrationLink(event)}
+          className="block w-100 py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors"
         >
           Register Now
         </Link>
@@ -532,6 +543,7 @@ export default function EventPage() {
               {renderEventDetails()}
               {renderCategoriesSection()}
               {renderGiveawaySection()}
+              {renderDesktopRegistrationButton()}
             </div>
 
             <RightSidebar
