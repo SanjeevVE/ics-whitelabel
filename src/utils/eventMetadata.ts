@@ -34,6 +34,15 @@ interface Event {
   contactNum?: string;
 }
 
+export interface EventMetadataParams {
+  event?: Event;
+  slug?: string;
+  isRegisterPage?: boolean;
+  customTitle?: string;
+  customDescription?: string;
+  customImage?: string;
+}
+
 async function getEventData(slug: string): Promise<Event | null> {
   try {
     const eventSlug = String(slug);
@@ -47,7 +56,7 @@ async function getEventData(slug: string): Promise<Event | null> {
   }
 }
 
-function formatEventDate(dateString: string): string {
+export function formatEventDate(dateString: string): string {
   try {
     const date = new Date(dateString);
     return !isNaN(date.getTime())
@@ -59,17 +68,24 @@ function formatEventDate(dateString: string): string {
   }
 }
 
-function getMetaTitle(event: Event | null, isRegisterPage = false): string {
-  if (!event) return 'Event - Running Events';
+function getMetaTitle(
+  event: Event | null,
+  isRegisterPage = false,
+  customTitle?: string
+): string {
+  if (customTitle) return customTitle;
+  if (!event) return 'Event - SAP ICS Events';
 
   const suffix = isRegisterPage ? ' - Registration' : '';
-  return `${event.eventName}${suffix} - Running Events`;
+  return `${event.eventName}${suffix} - ICS Events`;
 }
 
 function getMetaDescription(
   event: Event | null,
-  isRegisterPage = false
+  isRegisterPage = false,
+  customDescription?: string
 ): string {
+  if (customDescription) return customDescription;
   if (!event) return 'Join exciting running events.';
 
   const eventDate = event.date ? ` on ${formatEventDate(event.date)}` : '';
@@ -122,72 +138,148 @@ function getMetaKeywords(event: Event | null): string {
   return keywords.join(', ');
 }
 
-export async function generateEventMetadata(
-  { params }: { params: { slug: string } },
-  isRegisterPage = false
+export function generateOgImageUrl(
+  event: Event | null,
+  baseUrl: string,
+  customImage?: string
+): string {
+  let imageUrl =
+    customImage ||
+    (event?.eventPicture && !event.eventPicture.startsWith('http')
+      ? `${baseUrl}${event.eventPicture}`
+      : event?.eventPicture ||
+        `${baseUrl}/img/ics/ics-sap-event-poster.jpg`);
+
+  return imageUrl;
+}
+
+export async function generateMetadata(
+  params: EventMetadataParams
 ): Promise<Metadata> {
   try {
-    const slug = String(params.slug);
-    const event = await getEventData(slug);
+    let event = params.event;
+    if (!event && params.slug) {
+      event = (await getEventData(params.slug)) || undefined;
+    }
 
-    const title = getMetaTitle(event, isRegisterPage);
-    const description = getMetaDescription(event, isRegisterPage);
-    const keywords = getMetaKeywords(event);
+    const isRegisterPage = params.isRegisterPage || false;
+    const title = getMetaTitle(
+      event || null,
+      isRegisterPage,
+      params.customTitle
+    );
+    const description = getMetaDescription(
+      event || null,
+      isRegisterPage,
+      params.customDescription
+    );
+    const keywords = getMetaKeywords(event || null);
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || 'https://www.novarace.in';
-    const canonicalUrl = isRegisterPage
-      ? `${baseUrl}/events/${slug}/register`
-      : `${baseUrl}/events/${slug}`;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sap.icsevents.in';
+    const canonicalUrl = `${baseUrl}${event?.slug ? `/${event.slug}` : ''}`;
+
+    const imageUrl = generateOgImageUrl(
+      event || null,
+      baseUrl,
+      params.customImage
+    );
+
+    const jsonLd = event
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'SportsEvent',
+          name: event.eventName,
+          description: event.description || event.aboutEvent || description,
+          startDate: event.date ? new Date(event.date).toISOString() : '',
+          location: {
+            '@type': 'Place',
+            name: event.location,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: event.location,
+            },
+          },
+          image: imageUrl,
+          organizer: {
+            '@type': 'Organization',
+            name: 'SAP ICS Events',
+            email: event.orgEmail || '',
+            telephone: event.contactNum || '',
+          },
+          offers:
+            event.category?.map((cat) => ({
+              '@type': 'Offer',
+              name: cat.name || '',
+              price: cat.amount || '',
+              priceCurrency: 'INR',
+              description: cat.description || '',
+            })) || [],
+        }
+      : null;
 
     return {
       title,
       description,
       keywords,
+      authors: [{ name: 'SAP ICS Events' }],
+      creator: 'SAP ICS Events',
+      publisher: 'SAP ICS Events',
+      formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+      },
       openGraph: {
         title,
         description,
         type: 'website',
-        url: canonicalUrl,
-        images: event?.eventPicture
-          ? [
-              {
-                url: event.eventPicture,
-                width: 1200,
-                height: 630,
-                alt: event.eventName || 'Event',
-              },
-            ]
-          : [
-              {
-                url: `${baseUrl}/images/og-default.jpg`,
-                width: 1200,
-                height: 630,
-                alt: 'Running Events',
-              },
-            ],
-        siteName: 'NovaRace',
+        url: canonicalUrl || undefined,
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: event?.eventName || 'SAP ICS Events',
+          },
+        ],
+        siteName: 'SAP ICS Events',
+        locale: 'en_IN',
       },
       twitter: {
         card: 'summary_large_image',
+        site: '@icsevents',
+        creator: '@icsevents',
         title,
         description,
-        images: event?.eventPicture
-          ? [event.eventPicture]
-          : [`${baseUrl}/images/og-default.jpg`],
+        images: [imageUrl],
       },
-      alternates: {
-        canonical: canonicalUrl,
+      alternates: canonicalUrl
+        ? {
+            canonical: canonicalUrl,
+          }
+        : undefined,
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
       },
-      other: {
-        'event-type': 'sports-event',
-        'event:start_time': event?.date
-          ? new Date(event.date).toISOString()
-          : '',
-        'event:location': event?.location || '',
-        'geo.region': 'IN',
-        'geo.placename': event?.location || '',
-      },
+      other: event
+        ? {
+            'event-type': 'sports-event',
+            'event:start_time': event.date
+              ? new Date(event.date).toISOString()
+              : '',
+            'event:location': event.location || '',
+            'geo.region': 'IN',
+            'geo.placename': event.location || '',
+          }
+        : undefined,
     };
   } catch (error) {
     console.error('Error generating metadata:', error);
@@ -199,4 +291,14 @@ export async function generateEventMetadata(
         'running, cycling, marathon, events, fitness, sports, India, registration',
     };
   }
+}
+
+export async function generateEventMetadata(
+  { params }: { params: { slug: string } },
+  isRegisterPage = false
+): Promise<Metadata> {
+  return generateMetadata({
+    slug: params.slug,
+    isRegisterPage,
+  });
 }

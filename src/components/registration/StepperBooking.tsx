@@ -124,12 +124,14 @@ const useEvent = (eventSlug: string) => {
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const fetchedRef = React.useRef(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        if (!eventSlug) return;
-
+        if (!eventSlug || fetchedRef.current) return;
+        
+        fetchedRef.current = true;
         const response = await getEventBySlug(eventSlug);
         if (response && response.data) {
           setEvent({
@@ -154,12 +156,14 @@ const useEvent = (eventSlug: string) => {
 const useEarlyBirdCoupon = (eventId: string | undefined) => {
   const [earlyBirdCoupon, setEarlyBirdCoupon] = useState<Coupon | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const fetchedRef = React.useRef(false);
 
   useEffect(() => {
     const fetchEarlyBirdCoupon = async () => {
       try {
-        if (!eventId) return;
-
+        if (!eventId || fetchedRef.current) return;
+        
+        fetchedRef.current = true;
         setIsLoading(true);
         const response = await getEarlyBirdCoupon(eventId);
 
@@ -328,6 +332,10 @@ const StepperBooking: React.FC = () => {
   const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const [errorList, setErrorList] = useState<string[]>([]);
   const [couponError, setCouponError] = useState<string | null>(null);
+  
+  // Use a ref to track if we've already loaded the event data
+  const eventLoadedRef = React.useRef(false);
+  
   const { event, isLoading: isEventLoading, error } = useEvent(eventSlug);
   const { earlyBirdCoupon } = useEarlyBirdCoupon(event?.id);
 
