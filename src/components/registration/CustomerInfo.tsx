@@ -248,10 +248,15 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     }
   }, [formik.values.enableWhatsApp, formik.values.mobileNumber]);
 
+  const fetchedClubsRef = React.useRef(false);
+  
   useEffect(() => {
     const fetchRunnerClubs = async () => {
+      if (fetchedClubsRef.current) return;
+      
       setIsLoading(true);
       try {
+        fetchedClubsRef.current = true;
         const response = await getRunnerClubs();
 
         let clubs = [];
@@ -275,7 +280,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     };
 
     fetchRunnerClubs();
-  }, [eventCategory?.eventId]);
+  }, []);
 
   const handleClubSelect = (clubName: string) => {
     setIsDropdownOpen(false);
