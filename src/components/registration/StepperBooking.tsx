@@ -580,7 +580,7 @@ const StepperBooking: React.FC = () => {
     if (couponError) {
       setCouponError(null);
     }
-  }, [formik.values.couponCode]);
+  }, [formik.values.couponCode, couponError]);
 
   useEffect(() => {
     if (event && event.category) {
@@ -601,7 +601,7 @@ const StepperBooking: React.FC = () => {
         formik.setFieldValue('distance', selectedCategory.distance || '');
       }
     }
-  }, [event, formik.values.categoryName]);
+  }, [event, formik.values.categoryName, formik]);
 
   useEffect(() => {
     const age = formik.values.dateOfBirth
@@ -654,7 +654,7 @@ const StepperBooking: React.FC = () => {
     if (earlyBirdCoupon?.couponCode) {
       formik.setFieldValue('couponCode', earlyBirdCoupon.couponCode);
     }
-  }, [earlyBirdCoupon]);
+  }, [earlyBirdCoupon, formik]);
 
   const isMatched = matchedAgeBracket.startsWith('You are registering');
 

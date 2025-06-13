@@ -143,7 +143,7 @@ export function generateOgImageUrl(
   baseUrl: string,
   customImage?: string
 ): string {
-  let imageUrl =
+  const imageUrl =
     customImage ||
     (event?.eventPicture && !event.eventPicture.startsWith('http')
       ? `${baseUrl}${event.eventPicture}`

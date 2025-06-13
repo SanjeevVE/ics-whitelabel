@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -124,7 +124,7 @@ export default function EventPage() {
     return formatEventDate(dateString);
   }
 
-  async function fetchEventData(slug: string) {
+  const fetchEventData = React.useCallback(async (slug: string) => {
     try {
       setLoading(true);
       const response = await getEventBySlug(slug);
@@ -146,7 +146,7 @@ export default function EventPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   async function fetchLocationCoordinates(location: string) {
     try {
@@ -172,7 +172,7 @@ export default function EventPage() {
   useEffect(() => {
     if (!slug) return;
     fetchEventData(slug);
-  }, [slug]);
+  }, [slug, fetchEventData]);
 
   function EventCategories({ event }: { event: Event }) {
     if (!event || !event.category) return null;
