@@ -373,7 +373,7 @@ const StepperBooking: React.FC = () => {
       city: '',
       pincode: '',
       state: '',
-      country: event?.location?.split(', ').pop() || '',
+      country: '',
       emergencyContactName: '',
       emergencyContactNumber: '',
       categoryName: initialCategoryName,
