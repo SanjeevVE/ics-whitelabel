@@ -124,8 +124,6 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   const handleShowImage = () => setShowModal(true);
   const handleCloseImage = () => setShowModal(false);
 
-  // Removed misplaced export default function TShirtImagePopup.
-
   const IndianStates = [
     'Andhra Pradesh',
     'Arunachal Pradesh',
@@ -194,19 +192,18 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
 
   const handleDateChange = useCallback(
     (date: unknown) => {
+      if (!date) return;
+      
       formik.setFieldTouched('dateOfBirth', true);
-      const adjustedDate = new Date(date as string);
-      adjustedDate.setMinutes(
-        adjustedDate.getMinutes() - adjustedDate.getTimezoneOffset()
-      );
-      const utcDate = new Date(
-        Date.UTC(
-          adjustedDate.getFullYear(),
-          adjustedDate.getMonth(),
-          adjustedDate.getDate()
-        )
-      );
-      formik.setFieldValue('dateOfBirth', utcDate.toISOString().split('T')[0]);
+      
+      const selectedDate = new Date(date as string);
+      
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      
+      formik.setFieldValue('dateOfBirth', formattedDate);
 
       const newAge = calculateAge(date as string);
       setAge(newAge);
@@ -782,7 +779,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
                     ? new Date(formik.values.dateOfBirth)
                     : null
                 }
-                onChange={(date) => formik.setFieldValue('dateOfBirth', date)}
+                onChange={handleDateChange}
                 onBlur={formik.handleBlur}
                 disabled={!formik.values.categoryName}
                 dateFormat="dd/MM/yyyy"
