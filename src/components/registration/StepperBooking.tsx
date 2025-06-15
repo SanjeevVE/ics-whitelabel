@@ -733,6 +733,13 @@ const StepperBooking: React.FC = () => {
     }
   };
 
+  // Check if event registration is closed
+  useEffect(() => {
+    if (event && (event.tag === "Closed" || event.status !== "OPENFORREGISTRATION")) {
+      window.location.href = `/events/${event.slug}`;
+    }
+  }, [event]);
+
   if (isEventLoading || loading) return <BlockingLoader />;
 
   if (error) {

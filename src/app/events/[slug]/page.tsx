@@ -229,8 +229,8 @@ export default function EventPage() {
                   Register
                 </Link>
               ) : (
-                <span className="inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded opacity-70 cursor-not-allowed">
-                  Register
+                <span className="inline-block mt-4 py-2 px-6 bg-gray-500 text-white rounded opacity-70 cursor-not-allowed">
+                  Registration Closed
                 </span>
               )}
             </div>
@@ -294,11 +294,12 @@ export default function EventPage() {
   }
 
   function renderClosedEventNotification() {
-    if (event && event.status === 'CLOSED') {
+    if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
       return (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
-          <p className="font-bold">Registration Closed</p>
-          <p>Registration for this event is currently closed.</p>
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center">
+          <h2 className="text-xl font-bold mb-2">Registrations are now officially closed!</h2>
+          <p className="mb-2">Thank you for your incredible interest and overwhelming response.</p>
+          <p>Stay tuned for exciting updates and future events—we look forward to seeing you soon!</p>
         </div>
       );
     }
@@ -441,7 +442,17 @@ export default function EventPage() {
   }
 
   function renderMobileRegistrationButton() {
-    if (!event || !isRegistrationOpen(event)) return null;
+    if (!event) return null;
+    
+    if (!isRegistrationOpen(event)) {
+      return (
+        <div className="mt-8 md:hidden">
+          <div className="block w-full py-3 px-6 bg-gray-500 text-white text-center rounded-lg opacity-70 cursor-not-allowed">
+            Registration Closed
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="mt-8 md:hidden">
@@ -455,7 +466,17 @@ export default function EventPage() {
     );
   }
   function renderDesktopRegistrationButton() {
-    if (!event || !isRegistrationOpen(event)) return null;
+    if (!event) return null;
+    
+    if (!isRegistrationOpen(event)) {
+      return (
+        <div className="mt-8 hidden md:block">
+          <div className="block w-100 py-3 px-6 bg-gray-500 text-white text-center rounded-lg opacity-70 cursor-not-allowed">
+            Registration Closed
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="mt-8 hidden md:block ">
