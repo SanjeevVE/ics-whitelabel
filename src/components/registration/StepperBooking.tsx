@@ -130,7 +130,7 @@ const useEvent = (eventSlug: string) => {
     const fetchEvent = async () => {
       try {
         if (!eventSlug || fetchedRef.current) return;
-        
+
         fetchedRef.current = true;
         const response = await getEventBySlug(eventSlug);
         if (response && response.data) {
@@ -162,7 +162,7 @@ const useEarlyBirdCoupon = (eventId: string | undefined) => {
     const fetchEarlyBirdCoupon = async () => {
       try {
         if (!eventId || fetchedRef.current) return;
-        
+
         fetchedRef.current = true;
         setIsLoading(true);
         const response = await getEarlyBirdCoupon(eventId);
@@ -332,10 +332,10 @@ const StepperBooking: React.FC = () => {
   const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const [errorList, setErrorList] = useState<string[]>([]);
   const [couponError, setCouponError] = useState<string | null>(null);
-  
+
   // Use a ref to track if we've already loaded the event data
   const eventLoadedRef = React.useRef(false);
-  
+
   const { event, isLoading: isEventLoading, error } = useEvent(eventSlug);
   const { earlyBirdCoupon } = useEarlyBirdCoupon(event?.id);
 
@@ -346,12 +346,14 @@ const StepperBooking: React.FC = () => {
   ): FormValues => {
     let initialCategoryName = '';
     if (categoryFromUrl && event?.category) {
-      const categoryExists = event.category.some(cat => cat.name === categoryFromUrl);
+      const categoryExists = event.category.some(
+        (cat) => cat.name === categoryFromUrl
+      );
       if (categoryExists) {
         initialCategoryName = categoryFromUrl;
       }
     }
-    
+
     return {
       firstName: '',
       lastName: '',
@@ -438,7 +440,11 @@ const StepperBooking: React.FC = () => {
 
   const formik = useFormik<FormikValues>({
     enableReinitialize: true,
-    initialValues: getInitialFormValues(event, earlyBirdCoupon, categoryFromUrl),
+    initialValues: getInitialFormValues(
+      event,
+      earlyBirdCoupon,
+      categoryFromUrl
+    ),
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
@@ -668,6 +674,27 @@ const StepperBooking: React.FC = () => {
       formik.setFieldValue('couponCode', earlyBirdCoupon.couponCode);
     }
 
+    const age = formik.values.dateOfBirth
+      ? calculateAge(formik.values.dateOfBirth, event?.date)
+      : 0;
+
+    if (formik.values.categoryName && formik.values.dateOfBirth) {
+      const selectedCategory = event?.category?.find(
+        (cat) => cat.name === formik.values.categoryName
+      );
+
+      if (selectedCategory && age < selectedCategory.minimumAge) {
+        setMatchedAgeBracket(
+          `You are ineligible for ${formik.values.categoryName}. Minimum age required is ${selectedCategory.minimumAge} years.`
+        );
+        toast.error(
+          `You are ineligible for ${formik.values.categoryName}. Minimum age required is ${selectedCategory.minimumAge} years.`
+        );
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+    }
+
     const errors = await formik.validateForm();
 
     if (Object.keys(errors).length === 0) {
@@ -735,7 +762,10 @@ const StepperBooking: React.FC = () => {
 
   // Check if event registration is closed
   useEffect(() => {
-    if (event && (event.tag === "Closed" || event.status !== "OPENFORREGISTRATION")) {
+    if (
+      event &&
+      (event.tag === 'Closed' || event.status !== 'OPENFORREGISTRATION')
+    ) {
       window.location.href = `/events/${event.slug}`;
     }
   }, [event]);
