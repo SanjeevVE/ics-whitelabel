@@ -158,39 +158,37 @@ export default function RaceDayInfo() {
               </p>
             </div>
 
-{/* Map Display */}
-<div className="px-4 pb-8">
-  <div className="relative bg-gray-50 rounded-xl overflow-hidden">
-    <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            {/* Map Display */}
+            <div className='px-4 pb-8'>
+              <div className='relative bg-gray-50 rounded-xl overflow-hidden'>
+                <div className='bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'>
+                  {/* Desktop View - Embedded Map */}
+                  <div className='hidden sm:block w-full h-[60vh] sm:h-[70vh] md:aspect-video border border-gray-300 rounded-lg shadow-lg overflow-hidden'>
+                    <iframe
+                      src={map.pdfPath}
+                      title='Route Map PDF'
+                      className='w-full h-full'
+                      loading='lazy'
+                    />
+                  </div>
 
-      {/* Desktop View - Embedded Map */}
-      <div className="hidden sm:block w-full h-[60vh] sm:h-[70vh] md:aspect-video border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-        <iframe
-          src={map.pdfPath}
-          title="Route Map PDF"
-          className="w-full h-full"
-          loading="lazy"
-        />
-      </div>
-
-      {/* Mobile View - Button to Open PDF */}
-      <div className="block sm:hidden text-center py-8">
-        <p className="text-gray-700 mb-4">Tap below to view the route map:</p>
-        <a
-          href={map.pdfPath}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
-        >
-          Open Route Map
-        </a>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-
+                  {/* Mobile View - Button to Open PDF */}
+                  <div className='block sm:hidden text-center py-8'>
+                    <p className='text-gray-700 mb-4'>
+                      Tap below to view the route map:
+                    </p>
+                    <a
+                      href={map.pdfPath}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition'
+                    >
+                      Open Route Map
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Map Information */}
             <div className='px-4 pb-12 space-y-6'>
@@ -322,7 +320,7 @@ export default function RaceDayInfo() {
                   {/* Pacer Info */}
                   <div className='bg-white rounded-lg p-4 w-full text-center'>
                     <p className='text-xs text-gray-700 italic leading-relaxed'>
-                      "{pacer.strategy}"
+                      &quot;{pacer.strategy}&quot;
                     </p>
                   </div>
 
@@ -354,7 +352,7 @@ export default function RaceDayInfo() {
                   <li>• Arrive 45-60 minutes before your race start</li>
                   <li>• Warm up in designated areas</li>
                   <li>• Use restroom facilities early</li>
-                  <li>• Stay hydrated but don't overdrink</li>
+                  <li>• Stay hydrated but don&apos;t overdrink</li>
                 </ul>
               </div>
 
