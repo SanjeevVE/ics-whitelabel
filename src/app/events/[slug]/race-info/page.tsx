@@ -158,22 +158,39 @@ export default function RaceDayInfo() {
               </p>
             </div>
 
-            {/* Map Display */}
-            {/* Map Display */}
-            <div className='px-4 pb-8'>
-              <div className='relative bg-gray-50 rounded-xl overflow-hidden'>
-                <div className='bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'>
-                  <div className='w-full h-[60vh] sm:h-[70vh] md:aspect-video border border-gray-300 rounded-lg shadow-lg overflow-hidden'>
-                    <iframe
-                      src={map.pdfPath}
-                      title='Route Map PDF'
-                      className='w-full h-full'
-                      loading='lazy'
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+{/* Map Display */}
+<div className="px-4 pb-8">
+  <div className="relative bg-gray-50 rounded-xl overflow-hidden">
+    <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+
+      {/* Desktop View - Embedded Map */}
+      <div className="hidden sm:block w-full h-[60vh] sm:h-[70vh] md:aspect-video border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+        <iframe
+          src={map.pdfPath}
+          title="Route Map PDF"
+          className="w-full h-full"
+          loading="lazy"
+        />
+      </div>
+
+      {/* Mobile View - Button to Open PDF */}
+      <div className="block sm:hidden text-center py-8">
+        <p className="text-gray-700 mb-4">Tap below to view the route map:</p>
+        <a
+          href={map.pdfPath}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+        >
+          Open Route Map
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
             {/* Map Information */}
             <div className='px-4 pb-12 space-y-6'>
