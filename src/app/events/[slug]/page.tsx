@@ -178,24 +178,24 @@ export default function EventPage() {
     if (!event || !event.category) return null;
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
         {event.category.map((item, index) => (
-          <div key={index} className="flex flex-col">
-            <div className="border-t-8 border-blue-600 rounded-lg flex-1 bg-blue-50 p-5 text-center shadow-lg transition-transform hover:scale-105">
-              <div className="flex flex-col gap-2 h-44">
-                <h5 className="font-bold text-lg">
+          <div key={index} className='flex flex-col'>
+            <div className='border-t-8 border-blue-600 rounded-lg flex-1 bg-blue-50 p-5 text-center shadow-lg transition-transform hover:scale-105'>
+              <div className='flex flex-col gap-2 h-44'>
+                <h5 className='font-bold text-lg'>
                   {item.name || `Category ${index + 1}`}
                 </h5>
-                <div className="font-bold flex items-center justify-center gap-1">
+                <div className='font-bold flex items-center justify-center gap-1'>
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
+                    xmlns='http://www.w3.org/2000/svg'
+                    width='1em'
+                    height='1em'
+                    viewBox='0 0 24 24'
                   >
                     <path
-                      fill="currentColor"
-                      d="M13.725 21L7 14v-2h3.5q1.325 0 2.288-.862T13.95 9H6V7h7.65q-.425-.875-1.263-1.437T10.5 5H6V3h12v2h-3.25q.35.425.625.925T15.8 7H18v2h-2.025q-.2 2.125-1.75 3.563T10.5 14h-.725l6.725 7z"
+                      fill='currentColor'
+                      d='M13.725 21L7 14v-2h3.5q1.325 0 2.288-.862T13.95 9H6V7h7.65q-.425-.875-1.263-1.437T10.5 5H6V3h12v2h-3.25q.35.425.625.925T15.8 7H18v2h-2.025q-.2 2.125-1.75 3.563T10.5 14h-.725l6.725 7z'
                     ></path>
                   </svg>
                   {item.displayAmount && item.displayAmount !== 'undefined'
@@ -205,7 +205,7 @@ export default function EventPage() {
                 {item.minimumAge && (
                   <div>
                     Minimum Age:{' '}
-                    <span className="font-bold">{item.minimumAge}</span>
+                    <span className='font-bold'>{item.minimumAge}</span>
                   </div>
                 )}
                 {/* {item.maximumAge && (
@@ -216,7 +216,7 @@ export default function EventPage() {
                 )} */}
                 {item.distance && (
                   <div>
-                    Distance: <span className="font-bold">{item.distance}</span>
+                    Distance: <span className='font-bold'>{item.distance}</span>
                   </div>
                 )}
               </div>
@@ -224,12 +224,12 @@ export default function EventPage() {
               {isRegistrationOpen(event) ? (
                 <Link
                   href={buildRegistrationLink(event, item.name)}
-                  className="inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  className='inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors'
                 >
                   Register
                 </Link>
               ) : (
-                <span className="inline-block mt-4 py-2 px-6 bg-gray-500 text-white rounded opacity-70 cursor-not-allowed">
+                <span className='inline-block mt-4 py-2 px-6 bg-gray-500 text-white rounded opacity-70 cursor-not-allowed'>
                   Registration Closed
                 </span>
               )}
@@ -246,7 +246,7 @@ export default function EventPage() {
     const aboutEvent = event.aboutEvent.split('\n').join('<br/>');
 
     return (
-      <div className="mt-5 text-base">
+      <div className='mt-5 text-base'>
         <div dangerouslySetInnerHTML={{ __html: aboutEvent }} />
       </div>
     );
@@ -254,12 +254,12 @@ export default function EventPage() {
 
   if (loading) {
     return (
-      <div className="container pt-40">
-        <div className="text-center">
-          <div className="spinner-border text-primary" role="status">
-            <div className="w-12 h-12 rounded-full border-4 border-blue-600 border-t-transparent animate-spin mx-auto"></div>
+      <div className='container pt-40'>
+        <div className='text-center'>
+          <div className='spinner-border text-primary' role='status'>
+            <div className='w-12 h-12 rounded-full border-4 border-blue-600 border-t-transparent animate-spin mx-auto'></div>
           </div>
-          <p className="mt-3">Loading event details...</p>
+          <p className='mt-3'>Loading event details...</p>
         </div>
       </div>
     );
@@ -267,12 +267,12 @@ export default function EventPage() {
 
   if (error) {
     return (
-      <div className="container pt-40">
+      <div className='container pt-40'>
         <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
+          className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative'
+          role='alert'
         >
-          <h4 className="font-bold">Error</h4>
+          <h4 className='font-bold'>Error</h4>
           <p>{error}</p>
         </div>
       </div>
@@ -281,12 +281,12 @@ export default function EventPage() {
 
   if (!event) {
     return (
-      <div className="container pt-40">
+      <div className='container pt-40'>
         <div
-          className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative"
-          role="alert"
+          className='bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative'
+          role='alert'
         >
-          <h4 className="font-bold">Event Not Found</h4>
+          <h4 className='font-bold'>Event Not Found</h4>
           <p>Sorry, we couldn&apos;t find the event you&apos;re looking for.</p>
         </div>
       </div>
@@ -296,28 +296,59 @@ export default function EventPage() {
   function renderClosedEventNotification() {
     if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
       return (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center">
-          <h2 className="text-xl font-bold mb-2">Registrations are now officially closed!</h2>
-          <p className="mb-2">Thank you for your incredible interest and overwhelming response.</p>
-          <p>Stay tuned for exciting updates and future events—we look forward to seeing you soon!</p>
+        <div className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center'>
+          <h2 className='text-xl font-bold mb-2'>
+            Registrations are now officially closed!
+          </h2>
+          <p className='mb-2'>
+            Thank you for your incredible interest and overwhelming response.
+          </p>
+          <p>
+            Stay tuned for exciting updates and future events—we look forward to
+            seeing you soon!
+          </p>
         </div>
       );
     }
     return null;
   }
 
+  //   function renderClosedEventNotification() {
+  //   if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
+  //     return (
+  //       <div className="relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center">
+  //         <div className="flex justify-end mb-4">
+  //           <a
+  //             href="http://localhost:3000/events/sap-run-2025/race-info"
+  //             target="_blank"
+  //             rel="noopener noreferrer"
+  //             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 animate-blink"
+  //           >
+  //             Race Info
+  //           </a>
+  //         </div>
+
+  //         <h2 className="text-xl font-bold mb-2">Registrations are now officially closed!</h2>
+  //         <p className="mb-2">Thank you for your incredible interest and overwhelming response.</p>
+  //         <p>Stay tuned for exciting updates and future events—we look forward to seeing you soon!</p>
+  //       </div>
+  //     );
+  //   }
+  //   return null;
+  // }
+
   function renderEventImage() {
     if (!event?.eventPicture) return null;
 
     return (
-      <div className="mt-4 rounded-lg overflow-hidden">
+      <div className='mt-4 rounded-lg overflow-hidden'>
         <Image
           src={event.eventPicture}
           alt={event.eventName}
           width={1200}
           height={600}
           priority={true}
-          className="w-full h-auto rounded-lg"
+          className='w-full h-auto rounded-lg'
         />
       </div>
     );
@@ -327,9 +358,9 @@ export default function EventPage() {
     if (!event?.description) return null;
 
     return (
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-3">About This Event</h2>
-        <div className="prose max-w-none">
+      <div className='mt-6'>
+        <h2 className='text-2xl font-semibold mb-3'>About This Event</h2>
+        <div className='prose max-w-none'>
           <div dangerouslySetInnerHTML={{ __html: event.description }} />
         </div>
       </div>
@@ -340,8 +371,8 @@ export default function EventPage() {
     if (!event?.category || event.category.length === 0) return null;
 
     return (
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Registration Categories</h2>
+      <div className='mt-8'>
+        <h2 className='text-2xl font-semibold mb-4'>Registration Categories</h2>
         <EventCategories event={event} />
       </div>
     );
@@ -351,16 +382,16 @@ export default function EventPage() {
     if (!event?.giveAway || event.giveAway.length === 0) return null;
 
     return (
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">What You Get</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div className='mt-8'>
+        <h2 className='text-2xl font-semibold mb-4'>What You Get</h2>
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
           {event.giveAway.map((item, index) => (
             <div
               key={index}
-              className="flex flex-col items-center p-4 bg-blue-50 rounded-lg shadow-sm text-center"
+              className='flex flex-col items-center p-4 bg-blue-50 rounded-lg shadow-sm text-center'
             >
               {giveAwayImages[item.name as keyof typeof giveAwayImages] && (
-                <div className="mb-2">
+                <div className='mb-2'>
                   <Image
                     src={
                       giveAwayImages[item.name as keyof typeof giveAwayImages]
@@ -372,7 +403,7 @@ export default function EventPage() {
                   />
                 </div>
               )}
-              <span className="text-sm font-medium">{item.name}</span>
+              <span className='text-sm font-medium'>{item.name}</span>
             </div>
           ))}
         </div>
@@ -384,46 +415,46 @@ export default function EventPage() {
     if (!event?.aboutEvent) return null;
 
     return (
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold">Event Details</h2>
+      <div className='mt-6'>
+        <h2 className='text-2xl font-semibold'>Event Details</h2>
         <br />
-        <p className="mb-1">
+        <p className='mb-1'>
           <strong>Event Name:</strong> SAP RUN 2025
         </p>
         <br />
-        <p className="mb-1">
+        <p className='mb-1'>
           <strong>Event Date:</strong> 3rd August 2025
         </p>
         <br />
 
-        <p className="mb-2 font-bold">Categories:</p>
-        <ul className="list-disc list-inside space-y-1">
+        <p className='mb-2 font-bold'>Categories:</p>
+        <ul className='list-disc list-inside space-y-1'>
           <li>
-            3K : <span className="line-through">₹500</span> → ₹0
+            3K : <span className='line-through'>₹500</span> → ₹0
           </li>
           <li>
-            5K : <span className="line-through">₹600</span> → ₹0
+            5K : <span className='line-through'>₹600</span> → ₹0
           </li>
           <li>
-            10K : <span className="line-through">₹800</span> → ₹0
+            10K : <span className='line-through'>₹800</span> → ₹0
           </li>
         </ul>
 
-        <div className="mb-6 mt-6">
-          <h2 className="text-lg font-semibold mb-3">
+        <div className='mb-6 mt-6'>
+          <h2 className='text-lg font-semibold mb-3'>
             Chief Guest for 2025: Jonty Rhodes
           </h2>
 
-          <div className="relative w-full max-w-xl h-80 mb-4 mx-auto rounded-lg overflow-hidden">
+          <div className='relative w-full max-w-xl h-80 mb-4 mx-auto rounded-lg overflow-hidden'>
             <Image
-              src="/img/ics/Sap-chief-guest.jpg"
-              alt="Chief Guest - Jonty Rhodes"
+              src='/img/ics/Sap-chief-guest.jpg'
+              alt='Chief Guest - Jonty Rhodes'
               fill
-              className="object-cover"
+              className='object-cover'
             />
           </div>
 
-          <p className="text-gray-700 leading-relaxed text-justify">
+          <p className='text-gray-700 leading-relaxed text-justify'>
             Jonty Rhodes is a South African professional cricket coach,
             commentator and former Test and One Day International cricketer. He
             is regarded as one of the greatest fielders of all time and was the
@@ -443,11 +474,11 @@ export default function EventPage() {
 
   function renderMobileRegistrationButton() {
     if (!event) return null;
-    
+
     if (!isRegistrationOpen(event)) {
       return (
-        <div className="mt-8 md:hidden">
-          <div className="block w-full py-3 px-6 bg-gray-500 text-white text-center rounded-lg opacity-70 cursor-not-allowed">
+        <div className='mt-8 md:hidden'>
+          <div className='block w-full py-3 px-6 bg-gray-500 text-white text-center rounded-lg opacity-70 cursor-not-allowed'>
             Registration Closed
           </div>
         </div>
@@ -455,10 +486,10 @@ export default function EventPage() {
     }
 
     return (
-      <div className="mt-8 md:hidden">
+      <div className='mt-8 md:hidden'>
         <Link
           href={buildRegistrationLink(event)}
-          className="block w-full py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors"
+          className='block w-full py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors'
         >
           Register Now
         </Link>
@@ -467,11 +498,11 @@ export default function EventPage() {
   }
   function renderDesktopRegistrationButton() {
     if (!event) return null;
-    
+
     if (!isRegistrationOpen(event)) {
       return (
-        <div className="mt-8 hidden md:block">
-          <div className="block w-100 py-3 px-6 bg-gray-500 text-white text-center rounded-lg opacity-70 cursor-not-allowed">
+        <div className='mt-8 hidden md:block'>
+          <div className='block w-100 py-3 px-6 bg-gray-500 text-white text-center rounded-lg opacity-70 cursor-not-allowed'>
             Registration Closed
           </div>
         </div>
@@ -479,10 +510,10 @@ export default function EventPage() {
     }
 
     return (
-      <div className="mt-8 hidden md:block ">
+      <div className='mt-8 hidden md:block '>
         <Link
           href={buildRegistrationLink(event)}
-          className="block w-100 py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors"
+          className='block w-100 py-3 px-6 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors'
         >
           Register Now
         </Link>
@@ -494,41 +525,41 @@ export default function EventPage() {
     <>
       {renderClosedEventNotification()}
 
-      <section className="md:p-8">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-2/3">
-              <div className="flex justify-between items-end pt-10 gap-3 flex-wrap">
+      <section className='md:p-8'>
+        <div className='container mx-auto px-6'>
+          <div className='flex flex-col lg:flex-row gap-6'>
+            <div className='w-full lg:w-2/3'>
+              <div className='flex justify-between items-end pt-10 gap-3 flex-wrap'>
                 <div>
-                  <div className="flex gap-5 items-center">
+                  <div className='flex gap-5 items-center'>
                     <div>
-                      <h1 className="text-3xl sm:text-4xl font-semibold">
+                      <h1 className='text-3xl sm:text-4xl font-semibold'>
                         {event.eventName}
                       </h1>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-5 items-center mt-2">
+                  <div className='flex flex-wrap gap-5 items-center mt-2'>
                     <div>
-                      <div className="flex items-center text-base">
+                      <div className='flex items-center text-base'>
                         <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 mr-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-5 w-5 mr-1'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
                         >
                           <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
                             strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'
                           />
                           <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
                             strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            d='M15 11a3 3 0 11-6 0 3 3 0 016 0z'
                           />
                         </svg>
                         {event.location}
@@ -536,19 +567,19 @@ export default function EventPage() {
                     </div>
                     {event.date && (
                       <div>
-                        <div className="flex items-center text-base">
+                        <div className='flex items-center text-base'>
                           <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-5 w-5 mr-1'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
                           >
                             <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
                               strokeWidth={2}
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
                             />
                           </svg>
                           {getFormattedDate()}
