@@ -40,7 +40,7 @@ const raceDetails = [
 const map = {
   title: 'Complete Route Overview',
   description: 'Full course map showing all race distances and key landmarks',
-  pdfPath: '/img/ics/SAP ROUTE MAPS 2025.pdf',
+  pdfPath: 'https://icsevents.in/sapraceinfo/SapRouteMaps2025.pdf',
 };
 
 const PacerAbout = ({ about }: { about: string }) => {
