@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   MapPin,
   Clock,
@@ -42,9 +42,23 @@ const map = {
   description: 'Full course map showing all race distances and key landmarks',
   pdfPath: 'https://icsevents.in/sapraceinfo/SapRouteMaps2025.pdf',
 };
-
 const PacerAbout = ({ about, dataImage }: { about: string; dataImage?: string }) => {
   const [expanded, setExpanded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const handleImageClick = () => {
+    if (imgRef.current) {
+      if (imgRef.current.requestFullscreen) {
+        imgRef.current.requestFullscreen();
+      } else if ((imgRef.current as any).webkitRequestFullscreen) {
+        // Safari support
+        (imgRef.current as any).webkitRequestFullscreen();
+      } else if ((imgRef.current as any).msRequestFullscreen) {
+        // IE11 support
+        (imgRef.current as any).msRequestFullscreen();
+      }
+    }
+  };
 
   return (
     <div className='bg-white rounded-lg w-full text-left p-2 sm:p-4'>
@@ -60,20 +74,12 @@ const PacerAbout = ({ about, dataImage }: { about: string; dataImage?: string })
       {expanded && dataImage && (
         <div className='mt-4'>
           <img
+            ref={imgRef}
             src={dataImage}
             alt='Pacer Data'
-            className='w-full max-w-md rounded border border-gray-300'
+            className='w-full max-w-md rounded border border-gray-300 cursor-pointer'
+            onClick={handleImageClick}
           />
-          <div className='mt-2'>
-            <a
-              href={dataImage}
-              target='_blank'
-              download
-              className='text-blue-600 text-sm hover:underline'
-            >
-              ⬇️ Open Pacer Info
-            </a>
-          </div>
         </div>
       )}
 

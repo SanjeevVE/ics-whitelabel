@@ -147,7 +147,7 @@ export const pacers: Pacer[] = [
 <p>You’ll cross that line and earn your 10K medal!<br>Stretch, cool down, click pics, and make memories.</p>
 <p>See you on Aug 3rd morning – let’s make it an amazing SAP Run! 😊</p>`,
     targetTime: 'Finish in 80:00',
-    dataImage: '/img/pacer/dataImg/MirnalData.png',
+    dataImage: 'https://icsevents.in/sapraceinfo/DataImage/MirnalData.png',
   },
   {
     number: 11,
