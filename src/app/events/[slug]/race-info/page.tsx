@@ -80,6 +80,16 @@ const PacerAbout = ({ about, dataImage }: { about: string; dataImage?: string })
             className='w-full max-w-md rounded border border-gray-300 cursor-pointer'
             onClick={handleImageClick}
           />
+          <div className='mt-2'>
+            <a
+              href={dataImage}
+              target='_blank'
+              download
+              className='text-blue-600 text-sm hover:underline'
+            >
+              ⬇️ Open Pacer Info
+            </a>
+          </div>
         </div>
       )}
 
