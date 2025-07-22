@@ -63,7 +63,7 @@ Follow me, and let's beat the clock together!`,
     name: '65 Min Bus – Abinash',
     image: '4SAP PACERS.png',
     about:
-      'Hi, I’m Abinash, and I’ll be co-leading the 65-minute bus for the SAP 10K. With years of running experience, I’m excited to help you cross the finish line with strength and confidence. Let’s stick together, stay steady, and enjoy the journey!',
+      'Hi, I am Abinash Nanda, a passionate runner who took up running few years ago as part of my recovery from a sports injury—and hasn’t looked back since. What started as rehab turned into a joyful routine, and today, running is my go-to for both physical and mental well-being.\n\nThrough dedication and consistency, I’ve been able to steadily improve and achieve a 10K personal best of 49 minutes. I am excited to pace the 65-minute 10K group, using a positive splits strategy that starts strong and eases off gradually—ideal for runners who want to build early confidence and finish comfortably.\n\nWhile not a professional runner, my consistency, encouragement, and first-hand experience of building back from injury should make me a relatable and supportive pacer for anyone chasing their finish line.',
     targetTime: 'Finish in 65:00',
   },
   {
