@@ -53,9 +53,8 @@ const PacerAbout = ({ about }: { about: string }) => {
           text-sm text-gray-700 leading-relaxed whitespace-pre-line text-justify
           ${expanded ? '' : 'line-clamp-3 sm:line-clamp-6'}
         `}
-      >
-        {about}
-      </p>
+        dangerouslySetInnerHTML={{ __html: about }}
+      />
       <button
         className='text-green-600 text-xs mt-1 hover:text-green-700'
         onClick={() => setExpanded(!expanded)}
@@ -68,9 +67,9 @@ const PacerAbout = ({ about }: { about: string }) => {
 };
 
 export default function RaceDayInfo() {
-  const [enableRaceExpoSection, setEnableRaceExpoSection] = useState(true);
+  const [enableRaceExpoSection, setEnableRaceExpoSection] = useState(false);
   const [enableRaceDayScheduleSection, setEnableRaceDayScheduleSection] =
-    useState(true);
+    useState(false);
 
   return (
     <>
@@ -97,6 +96,17 @@ export default function RaceDayInfo() {
         <meta property='og:type' content='website' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
       </head>
+      <div className='flex justify-end mt-4 pb-4 pr-4'>
+        <a
+          href='https://sap.icsevents.in/'
+          target='_blank'
+          rel='noopener noreferrer'
+          className='inline-block bg-white text-blue-700 border border-blue-700 px-4 py-2 rounded-full text-sm font-semibold shadow hover:bg-blue-50 transition'
+        >
+          About Event
+        </a>
+      </div>
+
       <div
         className=''
         style={{
@@ -142,7 +152,7 @@ export default function RaceDayInfo() {
               className='text-xl md:text-3xl font-bold mb-2 md:mb-4'
               style={{ color: '#2D4A9E' }}
             >
-              Meet Our Professional Pacers
+              Meet Our Official Pacers
             </h2>
             <p className='text-gray-600 max-w-2xl mx-auto text-sm md:text-base px-2'>
               Join our experienced pacers to achieve your target time. Each
