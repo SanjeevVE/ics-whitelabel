@@ -42,7 +42,13 @@ const map = {
   description: 'Full course map showing all race distances and key landmarks',
   pdfPath: 'https://icsevents.in/sapraceinfo/SapRouteMaps2025.pdf',
 };
-const PacerAbout = ({ about, dataImage }: { about: string; dataImage?: string }) => {
+const PacerAbout = ({
+  about,
+  dataImage,
+}: {
+  about: string;
+  dataImage?: string;
+}) => {
   const [expanded, setExpanded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -104,7 +110,6 @@ const PacerAbout = ({ about, dataImage }: { about: string; dataImage?: string })
     </div>
   );
 };
-
 
 export default function RaceDayInfo() {
   const [enableRaceExpoSection, setEnableRaceExpoSection] = useState(false);
