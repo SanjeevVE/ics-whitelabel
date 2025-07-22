@@ -316,29 +316,33 @@ export default function EventPage() {
   function renderClosedEventNotification() {
     if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
       return (
-        <div className='relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center'>
-          <div className='flex justify-end mb-4'>
-            <a
-              href='https://sapraceinfo.icsevents.in/'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 animate-blink'
-            >
-              Race Info
-            </a>
+        <div
+          style={{
+            background:
+              'linear-gradient(to bottom, #d0ebff 0%, #60a5fa 50%, #1e3a8a 100%)',
+          }}
+          className='relative text-white p-4 mb-4 text-center rounded text-sm sm:text-base'
+        >
+          <div className='flex justify-end mb-3'>
+<a
+  href='https://sapraceinfo.icsevents.in/'
+  target='_blank'
+  rel='noopener noreferrer'
+  className='bg-white text-blue-700 px-3 py-1.5 rounded hover:bg-blue-100 font-semibold shadow text-sm animate-blink'
+>
+  Race Info
+</a>
+
           </div>
 
-          <h2 className='text-xl font-bold mb-2'>
-            Registrations are now officially closed!
-          </h2>
+          <h2 className='text-lg font-bold mb-2'>Registration Closed!</h2>
           <p>
-            To know about Pacers, Route Map, Race Expo details, and Race Day
-            Information, please check the{' '}
+            View Pacers, Route, Expo & Race Day details on the{' '}
             <a
               href='https://sapraceinfo.icsevents.in/'
               target='_blank'
               rel='noopener noreferrer'
-              className='text-blue-600 underline'
+              className='underline font-semibold text-white hover:text-blue-200'
             >
               Race Info
             </a>{' '}
