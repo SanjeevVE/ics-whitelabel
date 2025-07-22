@@ -293,49 +293,62 @@ export default function EventPage() {
     );
   }
 
+  // function renderClosedEventNotification() {
+  //   if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
+  //     return (
+  //       <div className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center'>
+  //         <h2 className='text-xl font-bold mb-2'>
+  //           Registrations are now officially closed!
+  //         </h2>
+  //         <p className='mb-2'>
+  //           Thank you for your incredible interest and overwhelming response.
+  //         </p>
+  //         <p>
+  //           Stay tuned for exciting updates and future events—we look forward to
+  //           seeing you soon!
+  //         </p>
+  //       </div>
+  //     );
+  //   }
+  //   return null;
+  // }
+
   function renderClosedEventNotification() {
     if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
       return (
-        <div className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center'>
+        <div className='relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center'>
+          <div className='flex justify-end mb-4'>
+            <a
+              href='https://sapraceinfo.icsevents.in/'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 animate-blink'
+            >
+              Race Info
+            </a>
+          </div>
+
           <h2 className='text-xl font-bold mb-2'>
             Registrations are now officially closed!
           </h2>
-          <p className='mb-2'>
-            Thank you for your incredible interest and overwhelming response.
-          </p>
           <p>
-            Stay tuned for exciting updates and future events—we look forward to
-            seeing you soon!
+            To know about Pacers, Route Map, Race Expo details, and Race Day
+            Information, please check the{' '}
+            <a
+              href='https://sapraceinfo.icsevents.in/'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-blue-600 underline'
+            >
+              Race Info
+            </a>{' '}
+            page.
           </p>
         </div>
       );
     }
     return null;
   }
-
-  //   function renderClosedEventNotification() {
-  //   if (event && (event.status === 'CLOSED' || event.tag === 'Closed')) {
-  //     return (
-  //       <div className="relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 text-center">
-  //         <div className="flex justify-end mb-4">
-  //           <a
-  //             href="http://localhost:3000/events/sap-run-2025/race-info"
-  //             target="_blank"
-  //             rel="noopener noreferrer"
-  //             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 animate-blink"
-  //           >
-  //             Race Info
-  //           </a>
-  //         </div>
-
-  //         <h2 className="text-xl font-bold mb-2">Registrations are now officially closed!</h2>
-  //         <p className="mb-2">Thank you for your incredible interest and overwhelming response.</p>
-  //         <p>Stay tuned for exciting updates and future events—we look forward to seeing you soon!</p>
-  //       </div>
-  //     );
-  //   }
-  //   return null;
-  // }
 
   function renderEventImage() {
     if (!event?.eventPicture) return null;
