@@ -120,10 +120,16 @@ export default function RaceDayInfo() {
               <Calendar className='w-4 h-4 mr-1' />
               August 3rd, 2025
             </div>
-            <div className='flex items-center px-3 py-1.5 rounded-full backdrop-blur-md bg-white/30 text-white shadow-sm'>
-              <MapPin className='w-4 h-4 mr-1' />
-              KPTO, WhiteField, Bengaluru
-            </div>
+            <a
+              href='https://maps.app.goo.gl/r9Y7sZxHcBaytTFM8'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <div className='flex items-center px-3 py-1.5 rounded-full backdrop-blur-md bg-white/30 text-white shadow-sm cursor-pointer'>
+                <MapPin className='w-4 h-4 mr-1' />
+                KPTO, WhiteField, Bengaluru
+              </div>
+            </a>
           </div>
         </div>
       </div>
@@ -164,14 +170,6 @@ export default function RaceDayInfo() {
                   />
                 </div>
                 <PacerAbout about={pacer.about} />
-                <div className='mt-4 text-center'>
-                  <span
-                    className='inline-block mt-2 text-white text-xs px-3 py-1 rounded-full'
-                    style={{ backgroundColor: '#C7CC00' }}
-                  >
-                    10K Specialist
-                  </span>
-                </div>
               </div>
             ))}
           </div>
@@ -241,75 +239,78 @@ export default function RaceDayInfo() {
           </section>
         )}
 
-{/* 3. Race Day Schedule */}
-{enableRaceDayScheduleSection && (
-  <section className='bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8'>
-    <div className='text-center mb-6 md:mb-8'>
-      <h2
-        className='text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4'
-        style={{ color: '#2D4A9E' }}
-      >
-        Race Schedule & Timings
-      </h2>
-      <p className='text-sm sm:text-base text-gray-600'>
-        Plan your race day with our detailed timing schedule
-      </p>
-    </div>
-
-    <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6'>
-      {raceDetails.map((race, index) => (
-        <div
-          key={index}
-          className='rounded-2xl p-4 sm:p-6'
-          style={{
-            background: 'linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)',
-          }}
-        >
-          <div className='flex items-center justify-between mb-3 sm:mb-4'>
-            <h3
-              className='text-lg sm:text-xl font-bold'
-              style={{ color: '#2D4A9E' }}
-            >
-              {race.title}
-            </h3>
-            <Medal className='w-5 h-5 sm:w-6 sm:h-6' style={{ color: '#C7CC00' }} />
-          </div>
-
-          <div className='space-y-2 sm:space-y-3'>
-            <div className='flex items-center text-gray-700'>
-              <Clock
-                className='w-4 h-4 mr-2 sm:mr-3'
-                style={{ color: '#5395B7' }}
-              />
-              <span className='text-xs sm:text-sm'>
-                Reporting: <strong>{race.reportingTime}</strong>
-              </span>
+        {/* 3. Race Day Schedule */}
+        {enableRaceDayScheduleSection && (
+          <section className='bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8'>
+            <div className='text-center mb-6 md:mb-8'>
+              <h2
+                className='text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4'
+                style={{ color: '#2D4A9E' }}
+              >
+                Race Schedule & Timings
+              </h2>
+              <p className='text-sm sm:text-base text-gray-600'>
+                Plan your race day with our detailed timing schedule
+              </p>
             </div>
-            <div className='flex items-center text-gray-700'>
-              <Clock
-                className='w-4 h-4 mr-2 sm:mr-3'
-                style={{ color: '#C7CC00' }}
-              />
-              <span className='text-xs sm:text-sm'>
-                Start Time: <strong>{race.startTime}</strong>
-              </span>
+
+            <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6'>
+              {raceDetails.map((race, index) => (
+                <div
+                  key={index}
+                  className='rounded-2xl p-4 sm:p-6'
+                  style={{
+                    background:
+                      'linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)',
+                  }}
+                >
+                  <div className='flex items-center justify-between mb-3 sm:mb-4'>
+                    <h3
+                      className='text-lg sm:text-xl font-bold'
+                      style={{ color: '#2D4A9E' }}
+                    >
+                      {race.title}
+                    </h3>
+                    <Medal
+                      className='w-5 h-5 sm:w-6 sm:h-6'
+                      style={{ color: '#C7CC00' }}
+                    />
+                  </div>
+
+                  <div className='space-y-2 sm:space-y-3'>
+                    <div className='flex items-center text-gray-700'>
+                      <Clock
+                        className='w-4 h-4 mr-2 sm:mr-3'
+                        style={{ color: '#5395B7' }}
+                      />
+                      <span className='text-xs sm:text-sm'>
+                        Reporting: <strong>{race.reportingTime}</strong>
+                      </span>
+                    </div>
+                    <div className='flex items-center text-gray-700'>
+                      <Clock
+                        className='w-4 h-4 mr-2 sm:mr-3'
+                        style={{ color: '#C7CC00' }}
+                      />
+                      <span className='text-xs sm:text-sm'>
+                        Start Time: <strong>{race.startTime}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className='mt-3 pt-3 border-t border-gray-200'>
+                    <span
+                      className='inline-block text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full font-semibold'
+                      style={{ backgroundColor: '#2D4A9E' }}
+                    >
+                      {race.distance} Distance
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-
-          <div className='mt-3 pt-3 border-t border-gray-200'>
-            <span
-              className='inline-block text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full font-semibold'
-              style={{ backgroundColor: '#2D4A9E' }}
-            >
-              {race.distance} Distance
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
-
+          </section>
+        )}
 
         {/* 4. Route Map Section */}
         <section className='bg-white rounded-2xl shadow-lg overflow-hidden'>
