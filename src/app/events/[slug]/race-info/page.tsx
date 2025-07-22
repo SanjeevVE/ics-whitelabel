@@ -43,7 +43,7 @@ const map = {
   pdfPath: 'https://icsevents.in/sapraceinfo/SapRouteMaps2025.pdf',
 };
 
-const PacerAbout = ({ about }: { about: string }) => {
+const PacerAbout = ({ about, dataImage }: { about: string; dataImage?: string }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -55,8 +55,31 @@ const PacerAbout = ({ about }: { about: string }) => {
         `}
         dangerouslySetInnerHTML={{ __html: about }}
       />
+
+      {/* Show image and download link when expanded */}
+      {expanded && dataImage && (
+        <div className='mt-4'>
+          <img
+            src={dataImage}
+            alt='Pacer Data'
+            className='w-full max-w-md rounded border border-gray-300'
+          />
+          <div className='mt-2'>
+            <a
+              href={dataImage}
+              target='_blank'
+              download
+              className='text-blue-600 text-sm hover:underline'
+            >
+              ⬇️ Open Pacer Info
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Toggle button */}
       <button
-        className='text-green-600 text-xs mt-1 hover:text-green-700'
+        className='text-green-600 text-xs mt-2 hover:text-green-700'
         onClick={() => setExpanded(!expanded)}
         style={{ color: '#C7CC00' }}
       >
@@ -65,6 +88,7 @@ const PacerAbout = ({ about }: { about: string }) => {
     </div>
   );
 };
+
 
 export default function RaceDayInfo() {
   const [enableRaceExpoSection, setEnableRaceExpoSection] = useState(false);
@@ -162,26 +186,30 @@ export default function RaceDayInfo() {
           </div>
 
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
-            {pacers.map((pacer) => (
-              <div
-                key={pacer.number}
-                className='rounded-xl p-2 sm:p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col items-center'
-                style={{
-                  background:
-                    'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                  border: '1px solid #e2e8f0',
-                }}
-              >
-                <div className='w-full flex justify-center mb-2'>
-                  <img
-                    src={`/img/pacer/${pacer.image}`}
-                    alt={pacer.name}
-                    className='w-full max-w-[450px] h-auto object-cover border-2 border-white shadow-md rounded-lg'
-                  />
+            {pacers.map((pacer) => {
+              const dataImage = pacer.dataImage;
+
+              return (
+                <div
+                  key={pacer.number}
+                  className='rounded-xl p-2 sm:p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col items-center'
+                  style={{
+                    background:
+                      'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                    border: '1px solid #e2e8f0',
+                  }}
+                >
+                  <div className='w-full flex justify-center mb-2'>
+                    <img
+                      src={`/img/pacer/${pacer.image}`}
+                      alt={pacer.name}
+                      className='w-full max-w-[450px] h-auto object-cover border-2 border-white shadow-md rounded-lg'
+                    />
+                  </div>
+                  <PacerAbout about={pacer.about} dataImage={pacer.dataImage} />
                 </div>
-                <PacerAbout about={pacer.about} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
