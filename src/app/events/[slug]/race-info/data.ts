@@ -4,6 +4,7 @@ export type Pacer = {
   image: string;
   about: string;
   targetTime: string;
+  dataImage?: string; 
 };
 
 export const pacers: Pacer[] = [
@@ -30,6 +31,7 @@ export const pacers: Pacer[] = [
 <p>You can see the exact pace for each KM in the detailed chart below.</p>
 <p>Let’s run as a team, feed off each other's energy, and remain mentally tough. Trust your training, trust our plan, and let’s cross that finish line together! Let's do this!</p>`,
     targetTime: 'Finish in 55:00',
+    dataImage: 'https://icsevents.in/sapraceinfo/DataImage/BinodData.png',
   },
   {
     number: 3,
@@ -47,19 +49,11 @@ export const pacers: Pacer[] = [
 <p>Follow me, and let's beat the clock together!</p>`,
     targetTime: 'Finish in 60:00',
   },
+
   {
     number: 4,
-    name: '65 Min Bus – Abinash',
+    name: '60 Min Bus – Arun Rachegowda',
     image: '4SAP PACERS.png',
-    about: `<p>Hi, I am Abinash Nanda, a passionate runner who took up running few years ago as part of my recovery from a sports injury—and hasn’t looked back since. What started as rehab turned into a joyful routine, and today, running is my go-to for both physical and mental well-being.</p>
-<p>Through dedication and consistency, I’ve been able to steadily improve and achieve a 10K personal best of 49 minutes. I am excited to pace the 65-minute 10K group, using a positive splits strategy that starts strong and eases off gradually—ideal for runners who want to build early confidence and finish comfortably.</p>
-<p>While not a professional runner, my consistency, encouragement, and first-hand experience of building back from injury should make me a relatable and supportive pacer for anyone chasing their finish line.</p>`,
-    targetTime: 'Finish in 65:00',
-  },
-  {
-    number: 5,
-    name: '65 Min Bus – Arun Rachegowda',
-    image: '5SAP PACERS.png',
     about: `<p>Hi, This is Arun Rachegowda. I’ve been running since 2007 with SAP Roadies, completing 7 full marathons, 32 half marathons, and many 10Ks with a PB of 48 mins in 10K. I’ve trained and paced runners across distances and am excited to co-lead the 60-minute bus at the SAP Run. Our target is a strong finish around 59:45.</p>
 <p><strong>The pacing strategy is steady and energised:</strong></p>
 <ul>
@@ -68,7 +62,17 @@ export const pacers: Pacer[] = [
   <li>8–10K: ~5:50–5:54/km to finish strong and beat the clock</li>
 </ul>
 <p>We’ll maintain group motivation with positive cues and energy, ensuring a good run. With 50- and 70-minute pacers also on course, we’ll help runners lock into the right pace early and stay confident through the finish.</p>`,
+    targetTime: 'Finish in 60:00',
+  },
+    {
+    number: 5,
+    name: '65 Min Bus – Abinash',
+    image: '5SAP PACERS.png',
+    about: `<p>Hi, I am Abinash Nanda, a passionate runner who took up running few years ago as part of my recovery from a sports injury—and hasn’t looked back since. What started as rehab turned into a joyful routine, and today, running is my go-to for both physical and mental well-being.</p>
+<p>Through dedication and consistency, I’ve been able to steadily improve and achieve a 10K personal best of 49 minutes. I am excited to pace the 65-minute 10K group, using a positive splits strategy that starts strong and eases off gradually—ideal for runners who want to build early confidence and finish comfortably.</p>
+<p>While not a professional runner, my consistency, encouragement, and first-hand experience of building back from injury should make me a relatable and supportive pacer for anyone chasing their finish line.</p>`,
     targetTime: 'Finish in 65:00',
+    dataImage: 'https://icsevents.in/sapraceinfo/DataImage/AbinashData.png',
   },
   {
     number: 6,
@@ -78,6 +82,7 @@ export const pacers: Pacer[] = [
 <p>This time, I’ll be your 10K pacer for 65 minutes - steady, supportive, and all about keeping you motivated every step of the way. From the basketball court to marathon roads, I’ve learned one thing: it’s not about pace, it’s about purpose.</p>
 <p>For a detailed race strategy, head over to my IG: <a href="https://instagram.com/ishantrivedi_">@ishantrivedi_</a><br>Got questions or pre-race jitters? DM me anytime and let’s cross that finish line together, strong and smiling! 💪🏽👟</p>`,
     targetTime: 'Finish in 65:00',
+    dataImage: 'https://icsevents.in/sapraceinfo/DataImage/IshaData.png',
   },
   {
     number: 7,
@@ -124,6 +129,7 @@ export const pacers: Pacer[] = [
 </ul>
 <p>I’ll adjust the pace based on elevation and conditions to keep things comfortable and consistent. Expect encouragement, pacing tips, and positive energy throughout the run. Whether it’s your first 10K or you’re chasing a personal best, I’m here to help you enjoy the journey and finish feeling strong. Let’s have fun, support each other, and make every step count!</p>`,
     targetTime: 'Finish in 75:00',
+    dataImage: 'https://icsevents.in/sapraceinfo/DataImage/VenkatData.png',
   },
   {
     number: 10,
@@ -141,6 +147,7 @@ export const pacers: Pacer[] = [
 <p>You’ll cross that line and earn your 10K medal!<br>Stretch, cool down, click pics, and make memories.</p>
 <p>See you on Aug 3rd morning – let’s make it an amazing SAP Run! 😊</p>`,
     targetTime: 'Finish in 80:00',
+    dataImage: '/img/pacer/dataImg/MirnalData.png',
   },
   {
     number: 11,
