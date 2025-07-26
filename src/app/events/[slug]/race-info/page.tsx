@@ -298,14 +298,6 @@ export default function RaceDayInfo() {
                       <p className='text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2'>
                         Whitefield BLR02 Reception Block
                       </p>
-                      <a
-                        href='https://maps.app.goo.gl/SAPWhitefieldLocation'
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='inline-flex items-center text-xs text-blue-600 hover:text-blue-800'
-                      >
-                        📍 View on Google Maps
-                      </a>
                     </div>
 
                     <div className='text-xs sm:text-sm text-gray-600 text-left'>
