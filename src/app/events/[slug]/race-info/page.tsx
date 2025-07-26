@@ -234,167 +234,196 @@ export default function RaceDayInfo() {
           </div>
         </section>
 
-     {/* 2. Bib Collection Section */}
+        {/* 2. Bib Collection Section */}
         {enableRaceExpoSection && (
           <section
-            className='rounded-2xl p-8'
+            className='rounded-2xl p-4 sm:p-6 md:p-8'
             style={{
               background: 'linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)',
             }}
           >
             <div className='text-center max-w-6xl mx-auto'>
               <h2
-                className='text-3xl font-bold mb-6'
+                className='text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6'
                 style={{ color: '#2D4A9E' }}
               >
                 Bib Collection & Race Expo
               </h2>
-              
+
               {/* Two column layout for SAP Employees vs Non-SAP */}
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
-                
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-4 sm:mb-6 md:mb-8'>
                 {/* Left Side - SAP Employees */}
-                <div className='bg-white rounded-xl p-6 shadow-sm border-2 border-blue-200'>
-                  <div className='mb-4'>
+                <div className='bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm border-2 border-blue-200'>
+                  <div className='mb-3 sm:mb-4'>
                     <span
-                      className='inline-block text-white px-4 py-2 rounded-full text-sm font-semibold'
+                      className='inline-block text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold'
                       style={{ backgroundColor: '#2D4A9E' }}
                     >
                       For SAP Employees
                     </span>
                   </div>
-                  
-                  <div className='space-y-4'>
+
+                  <div className='space-y-3 sm:space-y-4'>
                     <div className='flex items-center justify-center'>
                       <Calendar
-                        className='w-6 h-6 mr-3'
+                        className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 sm:mr-3'
                         style={{ color: '#B23A7D' }}
                       />
                       <div>
-                        <h3 className='text-lg font-semibold'>July 30, 2025</h3>
-                        <p className='text-sm text-gray-500'>Wednesday</p>
+                        <h3 className='text-sm sm:text-base md:text-lg font-semibold'>
+                          July 30, 2025
+                        </h3>
+                        <p className='text-xs sm:text-sm text-gray-500'>
+                          Wednesday
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className='flex items-center justify-center'>
                       <Clock
-                        className='w-6 h-6 mr-3'
+                        className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 sm:mr-3'
                         style={{ color: '#B23A7D' }}
                       />
                       <div>
-                        <h3 className='text-lg font-semibold'>10:00 AM - 5:00 PM</h3>
+                        <h3 className='text-sm sm:text-base md:text-lg font-semibold'>
+                          10:00 AM - 5:00 PM
+                        </h3>
                       </div>
                     </div>
-                    
-                    <div className='bg-gray-50 rounded-lg p-4'>
-                      <h4 className='font-semibold mb-2'>Venue:</h4>
-                      <p className='text-sm text-gray-600 mb-2'>
+
+                    <div className='bg-gray-50 rounded-lg p-3 sm:p-4'>
+                      <h4 className='text-sm sm:text-base font-semibold mb-1 sm:mb-2'>
+                        Venue:
+                      </h4>
+                      <p className='text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2'>
                         Whitefield BLR02 Reception Block
                       </p>
                       <a
-                        href="https://maps.app.goo.gl/SAPWhitefieldLocation"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href='https://maps.app.goo.gl/SAPWhitefieldLocation'
+                        target='_blank'
+                        rel='noopener noreferrer'
                         className='inline-flex items-center text-xs text-blue-600 hover:text-blue-800'
                       >
                         📍 View on Google Maps
                       </a>
                     </div>
-                    
-                    <div className='text-sm text-gray-600 text-left'>
-                      <h4 className='font-semibold mb-2'>Notes:</h4>
-                      <p>1. You may collect BIBs for registered family members</p>
+
+                    <div className='text-xs sm:text-sm text-gray-600 text-left'>
+                      <h4 className='text-sm sm:text-base font-semibold mb-1 sm:mb-2'>
+                        Notes:
+                      </h4>
+                      <p className='mb-1'>
+                        1. You may collect BIBs for registered family members
+                      </p>
                       <p>2. Spot registrations are not permitted</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Right Side - Non-SAP Employees */}
-                <div className='bg-white rounded-xl p-6 shadow-sm border-2 border-purple-200'>
-                  <div className='mb-4'>
+                <div className='bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm border-2 border-purple-200'>
+                  <div className='mb-3 sm:mb-4'>
                     <span
-                      className='inline-block text-white px-4 py-2 rounded-full text-sm font-semibold'
+                      className='inline-block text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold'
                       style={{ backgroundColor: '#B23A7D' }}
                     >
                       For Non-SAP Employees
                     </span>
                   </div>
-                  
-                  <div className='space-y-4'>
+
+                  <div className='space-y-3 sm:space-y-4'>
                     <div className='flex items-center justify-center'>
                       <Calendar
-                        className='w-6 h-6 mr-3'
+                        className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 sm:mr-3'
                         style={{ color: '#B23A7D' }}
                       />
                       <div>
-                        <h3 className='text-lg font-semibold'>August 1 & 2, 2025</h3>
-                        <p className='text-sm text-gray-500'>Friday & Saturday</p>
+                        <h3 className='text-sm sm:text-base md:text-lg font-semibold'>
+                          August 1 & 2, 2025
+                        </h3>
+                        <p className='text-xs sm:text-sm text-gray-500'>
+                          Friday & Saturday
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className='flex items-center justify-center'>
                       <Clock
-                        className='w-6 h-6 mr-3'
+                        className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 sm:mr-3'
                         style={{ color: '#B23A7D' }}
                       />
                       <div>
-                        <h3 className='text-lg font-semibold'>10:00 AM - 5:00 PM</h3>
+                        <h3 className='text-sm sm:text-base md:text-lg font-semibold'>
+                          10:00 AM - 5:00 PM
+                        </h3>
                       </div>
                     </div>
-                    
-                    <div className='bg-gray-50 rounded-lg p-4 space-y-3'>
+
+                    <div className='bg-gray-50 rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3'>
                       <div>
-                        <h4 className='font-semibold mb-1'>Venue 1:</h4>
-                        <p className='text-sm text-gray-600 mb-1'>
+                        <h4 className='text-sm sm:text-base font-semibold mb-1'>
+                          Venue 1:
+                        </h4>
+                        <p className='text-xs sm:text-sm text-gray-600 mb-1'>
                           JW Marriott, UB City, Jade Hall @Level 2
                         </p>
                         <a
-                          href="https://maps.app.goo.gl/oAaMsnNKUghguCgb8"
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href='https://maps.app.goo.gl/oAaMsnNKUghguCgb8'
+                          target='_blank'
+                          rel='noopener noreferrer'
                           className='inline-flex items-center text-xs text-blue-600 hover:text-blue-800'
                         >
                           📍 View on Google Maps
                         </a>
                       </div>
                       <div>
-                        <h4 className='font-semibold mb-1'>Venue 2:</h4>
-                        <p className='text-sm text-gray-600 mb-1'>
+                        <h4 className='text-sm sm:text-base font-semibold mb-1'>
+                          Venue 2:
+                        </h4>
+                        <p className='text-xs sm:text-sm text-gray-600 mb-1'>
                           Sheraton Grand, Whitefield
                         </p>
                         <a
-                          href="https://maps.app.goo.gl/oCxbNYFm1uN5vLN8A"
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href='https://maps.app.goo.gl/oCxbNYFm1uN5vLN8A'
+                          target='_blank'
+                          rel='noopener noreferrer'
                           className='inline-flex items-center text-xs text-blue-600 hover:text-blue-800'
                         >
                           📍 View on Google Maps
                         </a>
                       </div>
                     </div>
-                    
-                    <div className='text-sm text-gray-600 text-left'>
-                      <h4 className='font-semibold mb-2'>Notes:</h4>
-                      <p>1. You can pick up bibs for registered friends & family</p>
-                      <p>2. No spot registration available</p>
-                      <p>3. T-shirts distributed on first come first served basis</p>
+
+                    <div className='text-xs sm:text-sm text-gray-600 text-left'>
+                      <h4 className='text-sm sm:text-base font-semibold mb-1 sm:mb-2'>
+                        Notes:
+                      </h4>
+                      <p className='mb-1'>
+                        1. You can pick up bibs for registered friends & family
+                      </p>
+                      <p className='mb-1'>2. No spot registration available</p>
+                      <p>
+                        3. T-shirts distributed on first come first served basis
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* What to Bring Section */}
-              <div className='bg-white rounded-xl p-6 shadow-sm'>
-                <h3 className='text-lg font-semibold mb-4'>What to Bring</h3>
-                <div className='flex flex-wrap justify-center gap-4'>
+              <div className='bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm'>
+                <h3 className='text-sm sm:text-base md:text-lg font-semibold mb-3 sm:mb-4'>
+                  What to Bring
+                </h3>
+                <div className='flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4'>
                   <span
-                    className='text-white px-4 py-2 rounded-full text-sm'
+                    className='text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm'
                     style={{ backgroundColor: '#B23A7D' }}
                   >
                     Registration Confirmation
                   </span>
                   <span
-                    className='text-white px-4 py-2 rounded-full text-sm'
+                    className='text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm'
                     style={{ backgroundColor: '#B23A7D' }}
                   >
                     Valid ID Proof
@@ -421,29 +450,30 @@ export default function RaceDayInfo() {
             </div>
 
             {/* Coming Soon Message */}
-            <div className='text-center py-12'>
-              <div 
-                className='inline-flex items-center justify-center w-16 h-16 rounded-full mb-4'
+            <div className='text-center py-8 sm:py-10 md:py-12'>
+              <div
+                className='inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full mb-3 sm:mb-4'
                 style={{ backgroundColor: '#E6F0FF' }}
               >
-                <Clock 
-                  className='w-8 h-8'
+                <Clock
+                  className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8'
                   style={{ color: '#2D4A9E' }}
                 />
               </div>
-              <h3 
-                className='text-xl sm:text-2xl font-bold mb-3'
+              <h3
+                className='text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3'
                 style={{ color: '#2D4A9E' }}
               >
                 Race Schedule Coming Soon!
               </h3>
-              <p className='text-gray-600 max-w-md mx-auto'>
-                Detailed race timings and schedule will be updated soon. 
-                Stay tuned for more information about start times and reporting schedules.
+              <p className='text-sm sm:text-base text-gray-600 max-w-md mx-auto px-4'>
+                Detailed race timings and schedule will be updated soon. Stay
+                tuned for more information about start times and reporting
+                schedules.
               </p>
-              <div className='mt-6'>
+              <div className='mt-4 sm:mt-5 md:mt-6'>
                 <span
-                  className='inline-block text-white px-6 py-2 rounded-full text-sm font-semibold'
+                  className='inline-block text-white px-4 py-2 sm:px-5 sm:py-2 md:px-6 md:py-2 rounded-full text-xs sm:text-sm font-semibold'
                   style={{ backgroundColor: '#B23A7D' }}
                 >
                   Updates Coming Soon
@@ -511,6 +541,7 @@ export default function RaceDayInfo() {
             */}
           </section>
         )}
+
         {/* 4. Route Map Section */}
         <section className='bg-white rounded-2xl shadow-lg overflow-hidden'>
           <div className='p-8'>
