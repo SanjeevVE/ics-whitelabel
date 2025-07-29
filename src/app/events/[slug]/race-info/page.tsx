@@ -115,7 +115,7 @@ export default function RaceDayInfo() {
   const [enableRaceExpoSection, setEnableRaceExpoSection] = useState(true);
   const [enableRaceDayScheduleSection, setEnableRaceDayScheduleSection] =
     useState(true);
-  const [enableMaps, setEnableMaps] = useState(true);
+  const [enableMaps, setEnableMaps] = useState(false);
 
   return (
     <>
