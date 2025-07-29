@@ -115,6 +115,7 @@ export default function RaceDayInfo() {
   const [enableRaceExpoSection, setEnableRaceExpoSection] = useState(true);
   const [enableRaceDayScheduleSection, setEnableRaceDayScheduleSection] =
     useState(true);
+  const [enableMaps, setEnableMaps] = useState(false);
 
   return (
     <>
@@ -535,6 +536,7 @@ export default function RaceDayInfo() {
         )}
 
         {/* 4. Route Map Section */}
+        {enableMaps && (
         <section className='bg-white rounded-2xl shadow-lg overflow-hidden'>
           <div className='p-8'>
             <h2
@@ -590,6 +592,7 @@ export default function RaceDayInfo() {
             </div>
           </div>
         </section>
+        )}
       </div>
     </>
   );
