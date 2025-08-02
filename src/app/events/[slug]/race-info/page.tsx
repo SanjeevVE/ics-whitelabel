@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef } from 'react';
 import {
   MapPin,
   Clock,
@@ -10,37 +10,37 @@ import {
   Info,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import { pacers } from "./data";
+} from 'lucide-react';
+import { pacers } from './data';
 
 const raceDetails = [
   {
-    title: "10 KM Run",
-    reportingTime: "5:00 AM",
-    startTime: "5:45 AM",
-    distance: "10K",
-    participants: "2,500+",
+    title: '10 KM Run',
+    reportingTime: '5:00 AM',
+    startTime: '5:45 AM',
+    distance: '10K',
+    participants: '2,500+',
   },
   {
-    title: "5 KM Run",
-    reportingTime: "5:15 AM",
-    startTime: "6:00 AM",
-    distance: "5K",
-    participants: "1,800+",
+    title: '5 KM Run',
+    reportingTime: '5:15 AM',
+    startTime: '6:00 AM',
+    distance: '5K',
+    participants: '1,800+',
   },
   {
-    title: "3 KM Fun Run",
-    reportingTime: "5:30 AM",
-    startTime: "6:15 AM",
-    distance: "3K",
-    participants: "1,200+",
+    title: '3 KM Fun Run',
+    reportingTime: '5:30 AM',
+    startTime: '6:15 AM',
+    distance: '3K',
+    participants: '1,200+',
   },
 ];
 
 const map = {
-  title: "Complete Route Overview",
-  description: "Full course map showing all race distances and key landmarks",
-  pdfPath: "https://icsevents.in/sapraceinfo/SapRouteMaps2025.pdf",
+  title: 'Complete Route Overview',
+  description: 'Full course map showing all race distances and key landmarks',
+  pdfPath: 'https://icsevents.in/sapraceinfo/SapRouteMaps2025.pdf',
 };
 const PacerAbout = ({
   about,
@@ -71,7 +71,7 @@ const PacerAbout = ({
       <p
         className={`
           text-sm text-gray-700 leading-relaxed whitespace-pre-line text-justify
-          ${expanded ? "" : "line-clamp-3 sm:line-clamp-6"}
+          ${expanded ? '' : 'line-clamp-3 sm:line-clamp-6'}
         `}
         dangerouslySetInnerHTML={{ __html: about }}
       />
@@ -103,9 +103,9 @@ const PacerAbout = ({
       <button
         className="text-green-600 text-xs mt-2 hover:text-green-700"
         onClick={() => setExpanded(!expanded)}
-        style={{ color: "#C7CC00" }}
+        style={{ color: '#C7CC00' }}
       >
-        {expanded ? "Read Less" : "Read More"}
+        {expanded ? 'Read Less' : 'Read More'}
       </button>
     </div>
   );
@@ -157,7 +157,7 @@ export default function RaceDayInfo() {
         className=""
         style={{
           background:
-            "linear-gradient(to bottom, #d0ebff 0%, #60a5fa 50%, #1e3a8a 100%)",
+            'linear-gradient(to bottom, #d0ebff 0%, #60a5fa 50%, #1e3a8a 100%)',
         }}
       >
         {/* Banner Image */}
@@ -191,13 +191,132 @@ export default function RaceDayInfo() {
       </div>
 
       <div className="container mx-auto px-6 py-12 space-y-16">
-        {/* 1. Pacers Section */}
+        {enableRaceDayScheduleSection && (
+          <section className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8">
+            <div className="text-center mb-6 md:mb-8">
+              <h2
+                className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4"
+                style={{ color: '#2D4A9E' }}
+              >
+                Race Schedule & Timings
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600">
+                Plan your race day with our detailed timing schedule
+              </p>
+            </div>
+
+            <div className="flex justify-center overflow-x-auto mb-6">
+              <table className="table-auto text-sm sm:text-base border border-gray-200 rounded-lg min-w-[400px]">
+                <thead>
+                  <tr className="bg-[#2D4A9E] text-white text-center">
+                    <th className="px-6 py-3">Category</th>
+                    <th className="px-6 py-3">Reporting Time</th>
+                    <th className="px-6 py-3">Flag Off Time</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700 text-center">
+                  <tr className="border-t border-gray-200">
+                    <td className="px-6 py-3 font-semibold">10 KM</td>
+                    <td className="px-6 py-3">4:30 AM</td>
+                    <td className="px-6 py-3">5:30 AM</td>
+                  </tr>
+                  <tr className="border-t border-gray-200">
+                    <td className="px-6 py-3 font-semibold">5 KM</td>
+                    <td className="px-6 py-3">5:30 AM</td>
+                    <td className="px-6 py-3">6:30 AM</td>
+                  </tr>
+                  <tr className="border-t border-gray-200">
+                    <td className="px-6 py-3 font-semibold">3 KM</td>
+                    <td className="px-6 py-3">5:45 AM</td>
+                    <td className="px-6 py-3">6:45 AM</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Download Button */}
+            <div className="text-center">
+              <a
+                href="https://icsevents.in/sapraceinfo/SAP RUN 2025 - RACE INFORMATION.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-[#2D4A9E] text-white px-5 py-2 rounded-full font-semibold shadow hover:bg-[#1d3372] transition duration-300"
+              >
+                View Race Info (PDF)
+              </a>
+
+              <p className="text-sm text-gray-600 mt-3">
+                You can also view all detailed information in the{' '}
+                <strong>Race Info</strong> section.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* 4. Route Map Section */}
+        {enableMaps && (
+          <section className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="p-8">
+              <h2
+                className="text-3xl font-bold mb-4 text-center"
+                style={{ color: '#2D4A9E' }}
+              >
+                Interactive Route Maps
+              </h2>
+              <p className="text-gray-600 text-center mb-8">
+                Explore detailed course maps and key information
+              </p>
+            </div>
+            <div className="px-4 pb-8">
+              <div className="relative bg-gray-50 rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <div className="hidden sm:block w-full h-[60vh] sm:h-[70vh] md:aspect-video border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+                    <iframe
+                      src={map.pdfPath}
+                      title="Route Map PDF"
+                      className="w-full h-full"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="block sm:hidden text-center py-8">
+                    <p className="text-gray-700 mb-4">
+                      Tap below to view the route map:
+                    </p>
+                    <a
+                      href={map.pdfPath}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-6 py-3 text-white rounded-lg shadow hover:opacity-90 transition"
+                      style={{ backgroundColor: '#2D4A9E' }}
+                    >
+                      Open Route Map
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-4 pb-12 space-y-6">
+              <div className="text-center pt-6">
+                <a
+                  href={map.pdfPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 text-white rounded-lg hover:opacity-90 transition-colors"
+                  style={{ backgroundColor: '#2D4A9E' }}
+                >
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Download Full Route Map (PDF)
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
 
         {enableRaceExpoSection && (
           <section
             className="rounded-2xl p-4 sm:p-6 md:p-8"
             style={{
-              background: "linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)",
+              background: 'linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)',
             }}
           >
             <div className="text-center max-w-6xl mx-auto space-y-6">
@@ -211,7 +330,7 @@ export default function RaceDayInfo() {
                 <div className="mb-4">
                   <span
                     className="inline-block text-white px-4 py-2 rounded-full text-sm sm:text-base font-semibold"
-                    style={{ backgroundColor: "#B23A7D" }}
+                    style={{ backgroundColor: '#B23A7D' }}
                   >
                     Bib Collection for General Participants
                   </span>
@@ -222,7 +341,7 @@ export default function RaceDayInfo() {
                   <div className="flex items-center justify-center">
                     <Calendar
                       className="w-5 h-5 md:w-6 md:h-6 mr-3"
-                      style={{ color: "#B23A7D" }}
+                      style={{ color: '#B23A7D' }}
                     />
                     <div>
                       <h3 className="text-base md:text-lg font-semibold">
@@ -235,7 +354,7 @@ export default function RaceDayInfo() {
                   <div className="flex items-center justify-center">
                     <Clock
                       className="w-5 h-5 md:w-6 md:h-6 mr-3"
-                      style={{ color: "#B23A7D" }}
+                      style={{ color: '#B23A7D' }}
                     />
                     <h3 className="text-base md:text-lg font-semibold">
                       10:00 AM - 5:00 PM
@@ -316,13 +435,13 @@ export default function RaceDayInfo() {
                 <div className="flex flex-wrap justify-center gap-3">
                   <span
                     className="text-white px-4 py-2 rounded-full text-sm"
-                    style={{ backgroundColor: "#B23A7D" }}
+                    style={{ backgroundColor: '#B23A7D' }}
                   >
                     Registration Confirmation
                   </span>
                   <span
                     className="text-white px-4 py-2 rounded-full text-sm"
-                    style={{ backgroundColor: "#B23A7D" }}
+                    style={{ backgroundColor: '#B23A7D' }}
                   >
                     Valid ID Proof
                   </span>
@@ -332,132 +451,11 @@ export default function RaceDayInfo() {
           </section>
         )}
 
-        {enableRaceDayScheduleSection && (
-          <section className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8">
-            <div className="text-center mb-6 md:mb-8">
-              <h2
-                className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4"
-                style={{ color: "#2D4A9E" }}
-              >
-                Race Schedule & Timings
-              </h2>
-              <p className="text-sm sm:text-base text-gray-600">
-                Plan your race day with our detailed timing schedule
-              </p>
-            </div>
-
-            <div className="flex justify-center overflow-x-auto mb-6">
-              <table className="table-auto text-sm sm:text-base border border-gray-200 rounded-lg min-w-[400px]">
-                <thead>
-                  <tr className="bg-[#2D4A9E] text-white text-center">
-                    <th className="px-6 py-3">Category</th>
-                    <th className="px-6 py-3">Reporting Time</th>
-                    <th className="px-6 py-3">Flag Off Time</th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-700 text-center">
-                  <tr className="border-t border-gray-200">
-                    <td className="px-6 py-3 font-semibold">10 KM</td>
-                    <td className="px-6 py-3">4:30 AM</td>
-                    <td className="px-6 py-3">5:30 AM</td>
-                  </tr>
-                  <tr className="border-t border-gray-200">
-                    <td className="px-6 py-3 font-semibold">5 KM</td>
-                    <td className="px-6 py-3">5:30 AM</td>
-                    <td className="px-6 py-3">6:30 AM</td>
-                  </tr>
-                  <tr className="border-t border-gray-200">
-                    <td className="px-6 py-3 font-semibold">3 KM</td>
-                    <td className="px-6 py-3">5:45 AM</td>
-                    <td className="px-6 py-3">6:45 AM</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Download Button */}
-            <div className="text-center">
-              <a
-                href="https://icsevents.in/sapraceinfo/SAP RUN 2025 - RACE INFORMATION.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-[#2D4A9E] text-white px-5 py-2 rounded-full font-semibold shadow hover:bg-[#1d3372] transition duration-300"
-              >
-                View Race Info (PDF)
-              </a>
-
-              <p className="text-sm text-gray-600 mt-3">
-                You can also view all detailed information in the{" "}
-                <strong>Race Info</strong> section.
-              </p>
-            </div>
-          </section>
-        )}
-
-        {/* 4. Route Map Section */}
-        {enableMaps && (
-          <section className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="p-8">
-              <h2
-                className="text-3xl font-bold mb-4 text-center"
-                style={{ color: "#2D4A9E" }}
-              >
-                Interactive Route Maps
-              </h2>
-              <p className="text-gray-600 text-center mb-8">
-                Explore detailed course maps and key information
-              </p>
-            </div>
-            <div className="px-4 pb-8">
-              <div className="relative bg-gray-50 rounded-xl overflow-hidden">
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <div className="hidden sm:block w-full h-[60vh] sm:h-[70vh] md:aspect-video border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-                    <iframe
-                      src={map.pdfPath}
-                      title="Route Map PDF"
-                      className="w-full h-full"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="block sm:hidden text-center py-8">
-                    <p className="text-gray-700 mb-4">
-                      Tap below to view the route map:
-                    </p>
-                    <a
-                      href={map.pdfPath}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block px-6 py-3 text-white rounded-lg shadow hover:opacity-90 transition"
-                      style={{ backgroundColor: "#2D4A9E" }}
-                    >
-                      Open Route Map
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="px-4 pb-12 space-y-6">
-              <div className="text-center pt-6">
-                <a
-                  href={map.pdfPath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 text-white rounded-lg hover:opacity-90 transition-colors"
-                  style={{ backgroundColor: "#2D4A9E" }}
-                >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Download Full Route Map (PDF)
-                </a>
-              </div>
-            </div>
-          </section>
-        )}
-
         <section className="bg-white rounded-2xl shadow-lg p-2 md:p-8">
           <div className="text-center mb-6 md:mb-8">
             <h2
               className="text-xl md:text-3xl font-bold mb-2 md:mb-4"
-              style={{ color: "#2D4A9E" }}
+              style={{ color: '#2D4A9E' }}
             >
               Meet Our Official Pacers
             </h2>
@@ -478,8 +476,8 @@ export default function RaceDayInfo() {
                   className="rounded-xl p-2 sm:p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col items-center"
                   style={{
                     background:
-                      "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                    border: "1px solid #e2e8f0",
+                      'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                    border: '1px solid #e2e8f0',
                   }}
                 >
                   <div className="w-full flex justify-center mb-2">
