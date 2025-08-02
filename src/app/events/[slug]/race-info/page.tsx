@@ -192,67 +192,66 @@ export default function RaceDayInfo() {
 
       <div className="container mx-auto px-6 py-12 space-y-16">
         {enableRaceDayScheduleSection && (
-  <section className="bg-white rounded-2xl shadow-lg px-4 py-6 sm:px-6 md:px-8">
-    <div className="text-center mb-6 md:mb-8">
-      <h2
-        className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4"
-        style={{ color: '#2D4A9E' }}
-      >
-        Race Schedule & Timings
-      </h2>
-      <p className="text-sm sm:text-base text-gray-600">
-        Plan your race day with our detailed timing schedule
-      </p>
-    </div>
+          <section className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8">
+            <div className="text-center mb-6 md:mb-8">
+              <h2
+                className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4"
+                style={{ color: '#2D4A9E' }}
+              >
+                Race Schedule & Timings
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600">
+                Plan your race day with our detailed timing schedule
+              </p>
+            </div>
 
-    {/* Responsive Scrollable Table */}
-    <div className="w-full overflow-x-auto mb-6">
-      <table className="min-w-full table-auto border border-gray-200 rounded-lg text-sm sm:text-base">
-        <thead>
-          <tr className="bg-[#2D4A9E] text-white text-center">
-            <th className="px-4 sm:px-6 py-3">Category</th>
-            <th className="px-4 sm:px-6 py-3">Reporting Time</th>
-            <th className="px-4 sm:px-6 py-3">Flag Off Time</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-700 text-center">
-          <tr className="border-t border-gray-200">
-            <td className="px-4 sm:px-6 py-3 font-semibold">10 KM</td>
-            <td className="px-4 sm:px-6 py-3">4:30 AM</td>
-            <td className="px-4 sm:px-6 py-3">5:30 AM</td>
-          </tr>
-          <tr className="border-t border-gray-200">
-            <td className="px-4 sm:px-6 py-3 font-semibold">5 KM</td>
-            <td className="px-4 sm:px-6 py-3">5:30 AM</td>
-            <td className="px-4 sm:px-6 py-3">6:30 AM</td>
-          </tr>
-          <tr className="border-t border-gray-200">
-            <td className="px-4 sm:px-6 py-3 font-semibold">3 KM</td>
-            <td className="px-4 sm:px-6 py-3">5:45 AM</td>
-            <td className="px-4 sm:px-6 py-3">6:45 AM</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            <div className="flex justify-center overflow-x-auto mb-6">
+              <table className="table-auto text-sm sm:text-base border border-gray-200 rounded-lg min-w-[400px]">
+                <thead>
+                  <tr className="bg-[#2D4A9E] text-white text-center">
+                    <th className="px-6 py-3">Category</th>
+                    <th className="px-6 py-3">Reporting Time</th>
+                    <th className="px-6 py-3">Flag Off Time</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700 text-center">
+                  <tr className="border-t border-gray-200">
+                    <td className="px-6 py-3 font-semibold">10 KM</td>
+                    <td className="px-6 py-3">4:30 AM</td>
+                    <td className="px-6 py-3">5:30 AM</td>
+                  </tr>
+                  <tr className="border-t border-gray-200">
+                    <td className="px-6 py-3 font-semibold">5 KM</td>
+                    <td className="px-6 py-3">5:30 AM</td>
+                    <td className="px-6 py-3">6:30 AM</td>
+                  </tr>
+                  <tr className="border-t border-gray-200">
+                    <td className="px-6 py-3 font-semibold">3 KM</td>
+                    <td className="px-6 py-3">5:45 AM</td>
+                    <td className="px-6 py-3">6:45 AM</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-    {/* Download Button */}
-    <div className="text-center">
-      <a
-        href="https://icsevents.in/sapraceinfo/SAP RUN 2025 - RACE INFORMATION.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block w-full sm:w-auto bg-[#2D4A9E] text-white px-5 py-2 rounded-full font-semibold shadow hover:bg-[#1d3372] transition duration-300 text-center"
-      >
-        View Race Info (PDF)
-      </a>
+            {/* Download Button */}
+            <div className="text-center">
+              <a
+                href="https://icsevents.in/sapraceinfo/SAP RUN 2025 - RACE INFORMATION.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-[#2D4A9E] text-white px-5 py-2 rounded-full font-semibold shadow hover:bg-[#1d3372] transition duration-300"
+              >
+                View Race Info (PDF)
+              </a>
 
-      <p className="text-sm text-gray-600 mt-3 px-2">
-        You can also view all detailed information in the <strong>Race Info</strong> section.
-      </p>
-    </div>
-  </section>
-)}
-
+              <p className="text-sm text-gray-600 mt-3">
+                You can also view all detailed information in the{' '}
+                <strong>Race Info</strong> section.
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* 4. Route Map Section */}
         {enableMaps && (
@@ -262,7 +261,7 @@ export default function RaceDayInfo() {
                 className="text-3xl font-bold mb-4 text-center"
                 style={{ color: '#2D4A9E' }}
               >
-                Route Maps
+                Interactive Route Maps
               </h2>
               <p className="text-gray-600 text-center mb-8">
                 Explore detailed course maps and key information
@@ -313,37 +312,144 @@ export default function RaceDayInfo() {
           </section>
         )}
 
-      {enableRaceExpoSection && (
-  <section
-    className="rounded-2xl p-4 sm:p-6 md:p-8"
-    style={{
-      background: 'linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)',
-    }}
-  >
-    <div className="text-center max-w-4xl mx-auto space-y-6">
-      <h1 className="text-blue-800 font-bold text-xl sm:text-2xl md:text-3xl">
-        🚗 Parking & Arrival Information
-      </h1>
+        {enableRaceExpoSection && (
+          <section
+            className="rounded-2xl p-4 sm:p-6 md:p-8"
+            style={{
+              background: 'linear-gradient(135deg, #E6F0FF 0%, #B3D4FF 100%)',
+            }}
+          >
+            <div className="text-center max-w-6xl mx-auto space-y-6">
+              {/* Red H1 Warning */}
+              <h1 className="text-red-600 font-bold text-xl sm:text-2xl md:text-3xl">
+                ❗ No bib distribution on race day
+              </h1>
 
-      <div className="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-md border border-blue-300 text-left space-y-4 text-sm text-gray-700">
-        <h3 className="text-base font-semibold text-blue-800">Event Day: Sunday, August 3rd, 2025</h3>
+              {/* Bib Collection Info */}
+              <div className="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-md border-4 border-purple-300">
+                <div className="mb-4">
+                  <span
+                    className="inline-block text-white px-4 py-2 rounded-full text-sm sm:text-base font-semibold"
+                    style={{ backgroundColor: '#B23A7D' }}
+                  >
+                    Bib Collection for General Participants
+                  </span>
+                </div>
 
-        <ul className="list-disc pl-5 space-y-1">
-          <li>🕓 Parking gates will open from <strong>4:00 AM</strong></li>
-          <li>🅿️ Dedicated parking for <strong>SAP Employees</strong> is at the <strong>MLCP building</strong>. Carry your employee ID card for access into the campus.</li>
-          <li>🅿️ Dedicated 2-wheeler and 4-wheeler parking is available inside <strong>KTPO</strong> for non-SAP employees.</li>
-          <li>➡️ Follow signage for <strong>Gate 1 and Gate 2</strong></li>
-          <li>🚖 Entry and cab drop-off is only via <strong>Kundalahalli Main Road</strong></li>
-          <li>🙋 On-ground volunteers will assist with directions and parking</li>
-          <li>🎒 <strong>Baggage counter</strong> available.</li>
-        </ul>
+                {/* Date & Time */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center">
+                    <Calendar
+                      className="w-5 h-5 md:w-6 md:h-6 mr-3"
+                      style={{ color: '#B23A7D' }}
+                    />
+                    <div>
+                      <h3 className="text-base md:text-lg font-semibold">
+                        August 1 & 2, 2025
+                      </h3>
+                      <p className="text-sm text-gray-500">Friday & Saturday</p>
+                    </div>
+                  </div>
 
-        <p className="pt-4 font-medium">We request you to arrive well in advance to avoid last-minute rush.</p>
-      </div>
-    </div>
-  </section>
-)}
+                  <div className="flex items-center justify-center">
+                    <Clock
+                      className="w-5 h-5 md:w-6 md:h-6 mr-3"
+                      style={{ color: '#B23A7D' }}
+                    />
+                    <h3 className="text-base md:text-lg font-semibold">
+                      10:00 AM - 5:00 PM
+                    </h3>
+                  </div>
 
+                  {/* Venues */}
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                    <div>
+                      <h4 className="text-base font-semibold">Venue 1:</h4>
+                      <p className="text-sm text-gray-600">
+                        JW Marriott, Vittal Mallya Rd, Jade Hall @Level 2
+                      </p>
+                      <a
+                        href="https://maps.app.goo.gl/oAaMsnNKUghguCgb8?g_st=aw"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 text-sm hover:text-blue-800"
+                      >
+                        📍 View on Google Maps
+                      </a>
+                    </div>
+
+                    <div>
+                      <h4 className="text-base font-semibold">Venue 2:</h4>
+                      <p className="text-sm text-gray-600">
+                        Sheraton Grand Convention Hall, Whitefield
+                      </p>
+                      <a
+                        href="https://maps.app.goo.gl/oCxbNYFm1uN5vLN8A?g_st=aw"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 text-sm hover:text-blue-800"
+                      >
+                        📍 View on Google Maps
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Centered Notes */}
+                  <div className="flex justify-center mt-6">
+                    <div className="text-left max-w-md w-full text-sm text-gray-700 space-y-2">
+                      <h4 className="text-center text-base font-semibold mb-2">
+                        Notes:
+                      </h4>
+                      <p>1. No entry to the event venue without valid bib.</p>
+                      <p>
+                        2. You can pick up bibs for your registered friends &
+                        family members.
+                      </p>
+                      <p>3. No spot registration is available.</p>
+                      <p>
+                        4. T-shirts will be distributed on first come first
+                        served basis.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Race Info Link */}
+                  <div className="text-center pt-4">
+                    <a
+                      href="https://sapraceinfo.icsevents.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline text-sm hover:text-blue-800"
+                    >
+                      🔗 More race-related info
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* What to Bring */}
+              <div className="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
+                <h3 className="text-base md:text-lg font-semibold mb-4">
+                  What to Bring
+                </h3>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <span
+                    className="text-white px-4 py-2 rounded-full text-sm"
+                    style={{ backgroundColor: '#B23A7D' }}
+                  >
+                    Registration Confirmation
+                  </span>
+                  <span
+                    className="text-white px-4 py-2 rounded-full text-sm"
+                    style={{ backgroundColor: '#B23A7D' }}
+                  >
+                    Valid ID Proof
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="bg-white rounded-2xl shadow-lg p-2 md:p-8">
           <div className="text-center mb-6 md:mb-8">
