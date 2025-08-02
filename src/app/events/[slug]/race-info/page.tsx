@@ -267,7 +267,7 @@ export default function RaceDayInfo() {
                 Route Maps
               </h2>
               <p className="text-gray-600 text-center mb-8">
-                Explore detailed course maps and key information
+                Explore detailed course maps and key informations
               </p>
             </div>
             <div className="px-4 pb-8">
